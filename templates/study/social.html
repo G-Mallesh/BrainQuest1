@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Social Studies</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="study-container">
+
+    <div class="study-header">
+
+        <a href="{{ url_for('study') }}">
+            ← Study Zone
+        </a>
+
+        <h1>🌍 Social Studies</h1>
+
+        <span>{{ class_name }}</span>
+
+    </div>
+
+
+    <div class="lesson-grid">
+
+        <div class="lesson-card">
+
+            <h2>🏛️ History</h2>
+
+            <p>
+                Learn about important events,
+                people and civilizations.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🗺️ Geography</h2>
+
+            <p>
+                Countries, states, maps,
+                rivers and mountains.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🏛️ Civics</h2>
+
+            <p>
+                Learn about government,
+                rights and responsibilities.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🌾 Society</h2>
+
+            <p>
+                Communities, occupations,
+                culture and resources.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

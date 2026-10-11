@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Questions - Teacher Panel
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="teacher-container">
+
+
+    <div class="teacher-header">
+
+        <div>
+
+            <h1>
+                ❓ Question Management
+            </h1>
+
+            <p>
+                Create and manage quiz questions.
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <a
+                href="{{ url_for(
+                    'teacher_dashboard'
+                ) }}"
+            >
+                ← Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <section class="teacher-section">
+
+
+        <div class="question-toolbar">
+
+            <a
+                class="teacher-primary-button"
+                href="{{ url_for(
+                    'teacher_add_question'
+                ) }}"
+            >
+                ➕ Add Question
+            </a>
+
+        </div>
+
+
+        <div class="student-table-wrapper">
+
+            <table class="student-table">
+
+                <thead>
+
+                <tr>
+
+                    <th>
+                        Question
+                    </th>
+
+                    <th>
+                        Game
+                    </th>
+
+                    <th>
+                        Answer
+                    </th>
+
+                    <th>
+                        Points
+                    </th>
+
+                    <th>
+                        Difficulty
+                    </th>
+
+                </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for question in questions %}
+
+                <tr>
+
+                    <td>
+                        {{ question.question_text }}
+                    </td>
+
+                    <td>
+                        {{ question.game_title or
+                           "General Quiz" }}
+                    </td>
+
+                    <td>
+                        {{ question.correct_answer }}
+                    </td>
+
+                    <td>
+                        ⭐ {{ question.points }}
+                    </td>
+
+                    <td>
+                        {{ question.difficulty }}
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+
+                    <td colspan="5">
+
+                        No questions available.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+
+</html>

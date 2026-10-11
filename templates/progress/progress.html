@@ -1,0 +1,572 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Progress - BrainQuest Kids</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="progress-container">
+
+    <!-- HEADER -->
+    <div class="progress-header">
+
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+        <h1>
+            📊 My Progress
+        </h1>
+
+        <span>
+            BrainQuest Kids
+        </span>
+
+    </div>
+
+
+    <!-- XP CARD -->
+    <div class="progress-hero">
+
+        <div class="level-circle">
+
+            <span>
+                LEVEL
+            </span>
+
+            <strong>
+                {{ xp.current_level }}
+            </strong>
+
+        </div>
+
+
+        <div class="xp-information">
+
+            <h2>
+                ⭐ {{ xp.total_xp }} XP
+            </h2>
+
+            <p>
+                Keep learning and earn more XP!
+            </p>
+
+
+            <div class="xp-bar">
+
+                <div
+                    class="xp-bar-fill"
+                    style="width: {{ level_percentage|default(0)|int }}%;">
+                </div>
+
+            </div>
+
+
+            <small>
+                {{ level_percentage|default(0)|round|int }}%
+                to next level
+            </small>
+
+        </div>
+
+    </div>
+
+
+    <!-- QUICK STATS -->
+    <div class="progress-stats">
+
+        <div class="streak-message">
+
+            {% if xp.current_streak == 0 %}
+
+                🌱 Start learning today
+                and build your streak!
+
+            {% elif xp.current_streak < 3 %}
+
+                🔥 Great start!
+                Keep learning every day.
+
+            {% elif xp.current_streak < 7 %}
+
+                🚀 Amazing!
+                You are building a strong streak.
+
+            {% elif xp.current_streak < 30 %}
+
+                🏆 Fantastic!
+                You reached a 7+ day streak!
+
+            {% else %}
+
+                👑 Incredible!
+                You are a BrainQuest Kids champion!
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="progress-stat">
+
+            <div class="progress-stat-icon">
+                🔥
+            </div>
+
+            <h2>
+                {{ xp.current_streak }}
+            </h2>
+
+            <p>
+                Day Streak
+            </p>
+
+        </div>
+
+
+        <div class="progress-stat">
+
+            <div class="progress-stat-icon">
+                🏆
+            </div>
+
+            <h2>
+                {{ xp.longest_streak }}
+            </h2>
+
+            <p>
+                Longest Streak
+            </p>
+
+        </div>
+
+
+        <div class="progress-stat">
+
+            <div class="progress-stat-icon">
+                🎮
+            </div>
+
+            <h2>
+                {{ game_stats.games_played }}
+            </h2>
+
+            <p>
+                Games Played
+            </p>
+
+        </div>
+
+
+        <div class="progress-stat">
+
+            <div class="progress-stat-icon">
+                📝
+            </div>
+
+            <h2>
+                {{ task_stats.tasks_completed }}
+            </h2>
+
+            <p>
+                Tasks Completed
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ACTIVITY SUMMARY -->
+    <section class="progress-section">
+
+        <h2>
+            📚 Learning Activity
+        </h2>
+
+
+        <div class="activity-grid">
+
+            <div class="activity-card">
+
+                <div class="activity-icon">
+                    🎬
+                </div>
+
+                <h3>
+                    Videos
+                </h3>
+
+                <strong>
+                    {{ video_stats.videos_completed }}
+                </strong>
+
+                <p>
+                    Completed
+                </p>
+
+            </div>
+
+
+            <div class="activity-card">
+
+                <div class="activity-icon">
+                    📖
+                </div>
+
+                <h3>
+                    Stories
+                </h3>
+
+                <strong>
+                    {{ story_stats.stories_completed }}
+                </strong>
+
+                <p>
+                    Completed
+                </p>
+
+            </div>
+
+
+            <div class="activity-card">
+
+                <div class="activity-icon">
+                    🎨
+                </div>
+
+                <h3>
+                    Drawings
+                </h3>
+
+                <strong>
+                    {{ drawing_stats.drawings_created }}
+                </strong>
+
+                <p>
+                    Created
+                </p>
+
+            </div>
+
+
+            <div class="activity-card">
+
+                <div class="activity-icon">
+                    ⭐
+                </div>
+
+                <h3>
+                    Game Score
+                </h3>
+
+                <strong>
+                    {{ game_stats.total_score }}
+                </strong>
+
+                <p>
+                    Total Score
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- SUBJECT PROGRESS -->
+    <section class="progress-section">
+
+        <h2>
+            📚 Subject Progress
+        </h2>
+
+
+        {% for item in subject_progress %}
+
+        <div class="subject-progress-card">
+
+            <div class="subject-progress-info">
+
+                <strong>
+                    {{ item.subject }}
+                </strong>
+
+                <span>
+                    {{ item.completed_activities }}
+                    /
+                    {{ item.total_activities }}
+                </span>
+
+            </div>
+
+
+            {% if item.total_activities > 0 %}
+
+                {% set percentage =
+                    (
+                        item.completed_activities
+                        /
+                        item.total_activities
+                    ) * 100
+                %}
+
+            {% else %}
+
+                {% set percentage = 0 %}
+
+            {% endif %}
+
+
+            <div class="subject-progress-bar">
+
+                <div
+                    class="subject-progress-fill"
+                    style="width: {{ percentage|round|int }}%;">
+                </div>
+
+            </div>
+
+
+            <small>
+                {{ percentage|round|int }}%
+                completed
+            </small>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-progress">
+
+            📚 Subject progress will appear
+            as you complete learning activities.
+
+        </div>
+
+        {% endfor %}
+
+    </section>
+
+
+    <!-- BADGES -->
+    <section class="progress-section">
+
+        <h2>
+            🏆 Badges & Achievements
+        </h2>
+
+        <p class="reward-description">
+            Complete learning activities to unlock
+            special BrainQuest Kids badges!
+        </p>
+
+
+        <div class="badges-grid">
+
+            {% for badge in badges %}
+
+            <div class="badge-card
+                {% if badge.earned_at %}
+                    badge-earned
+                {% else %}
+                    badge-locked
+                {% endif %}">
+
+                <div class="badge-icon">
+
+                    {% if badge.icon_path %}
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=badge.icon_path
+                        ) }}"
+                        alt="{{ badge.badge_name }}"
+                    >
+
+                    {% else %}
+
+                        🏆
+
+                    {% endif %}
+
+                </div>
+
+
+                <h3>
+                    {{ badge.badge_name }}
+                </h3>
+
+
+                <p>
+                    {{ badge.description }}
+                </p>
+
+
+                {% if badge.earned_at %}
+
+                <span class="badge-status">
+                    ✅ Earned
+                </span>
+
+                {% else %}
+
+                <span class="badge-status">
+                    🔒 {{ badge.required_xp }} XP
+                </span>
+
+                {% endif %}
+
+            </div>
+
+            {% else %}
+
+            <div class="empty-progress">
+                No badges available yet.
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <!-- RECENT SCORES -->
+    <section class="progress-section">
+
+        <h2>
+            🎮 Recent Game Scores
+        </h2>
+
+
+        <div class="scores-table-wrapper">
+
+            <table class="scores-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Game
+                        </th>
+
+                        <th>
+                            Score
+                        </th>
+
+                        <th>
+                            Correct
+                        </th>
+
+                        <th>
+                            Wrong
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for score in recent_scores %}
+
+                    <tr>
+
+                        <td>
+                            {{ score.game_title or "Game" }}
+                        </td>
+
+                        <td>
+                            ⭐ {{ score.score }}
+                        </td>
+
+                        <td>
+                            {{ score.correct_answers }}
+                        </td>
+
+                        <td>
+                            {{ score.wrong_answers }}
+                        </td>
+
+                        <td>
+                            {{ score.played_at }}
+                        </td>
+
+                    </tr>
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="5">
+                            🎮 No games played yet.
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- NAVIGATION -->
+    <div class="progress-navigation">
+
+        <a
+            href="{{ url_for('tasks') }}"
+            class="progress-nav-button">
+            📝 Daily Tasks
+        </a>
+
+
+        <a
+            href="{{ url_for('study') }}"
+            class="progress-nav-button">
+            📚 Study Zone
+        </a>
+
+
+        <a
+            href="{{ url_for('videos') }}"
+            class="progress-nav-button">
+            🎬 Videos
+        </a>
+
+
+        <a
+            href="{{ url_for('stories') }}"
+            class="progress-nav-button">
+            📖 Stories
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Reports</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+
+</head>
+
+<body>
+
+<div class="admin-container">
+
+    <h1>📊 BrainQuest Reports</h1>
+
+    <br>
+
+    <a href="{{ url_for('admin_dashboard') }}">
+        ← Admin Dashboard
+    </a>
+
+    <br><br>
+
+    <div class="admin-stats">
+
+        <div class="admin-stat-card">
+            <span>👨‍🎓</span>
+            <h3>Students</h3>
+            <strong>
+                {{ students.total_students }}
+            </strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>⭐</span>
+            <h3>Total XP</h3>
+            <strong>
+                {{ xp.total_xp }}
+            </strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>🎮</span>
+            <h3>Games Played</h3>
+            <strong>
+                {{ games.total_games_played }}
+            </strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>📈</span>
+            <h3>Average Score</h3>
+            <strong>
+                {{ "%.1f"|format(
+                    games.average_score or 0
+                ) }}
+            </strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>📝</span>
+            <h3>Tasks Completed</h3>
+            <strong>
+                {{ tasks.completed_tasks }}
+            </strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>📖</span>
+            <h3>Stories Completed</h3>
+            <strong>
+                {{ stories.completed_stories }}
+            </strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>🎬</span>
+            <h3>Videos Completed</h3>
+            <strong>
+                {{ videos.completed_videos }}
+            </strong>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Task</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="teacher-container">
+
+    <div class="teacher-header">
+
+        <h1>✏️ Edit Daily Task</h1>
+
+        <a
+            href="{{ url_for('teacher_tasks') }}"
+            class="teacher-primary-button"
+        >
+            ← Back
+        </a>
+
+    </div>
+
+    <section class="teacher-form-section">
+
+        <form
+            method="POST"
+            class="teacher-form"
+        >
+
+            <label>Task Title</label>
+
+            <input
+                type="text"
+                name="title"
+                value="{{ task.title }}"
+                required
+            >
+
+            <label>Description</label>
+
+            <textarea name="description">{{ task.description or '' }}</textarea>
+
+            <label>Task Type</label>
+
+            <select name="task_type">
+
+                {% for value in [
+                    'study',
+                    'game',
+                    'reading',
+                    'drawing',
+                    'quiz',
+                    'video',
+                    'memory',
+                    'creative',
+                    'other'
+                ] %}
+
+                <option
+                    value="{{ value }}"
+                    {% if task.task_type == value %}
+                    selected
+                    {% endif %}
+                >
+                    {{ value.title() }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+            <label>Class</label>
+
+            <select name="class_id">
+
+                <option value="">
+                    All Classes
+                </option>
+
+                {% for class_item in classes %}
+
+                <option
+                    value="{{ class_item.id }}"
+                    {% if task.class_id == class_item.id %}
+                    selected
+                    {% endif %}
+                >
+                    {{ class_item.class_name }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+            <label>XP Points</label>
+
+            <input
+                type="number"
+                name="points"
+                value="{{ task.points or 10 }}"
+                min="1"
+            >
+
+            <label>Due Date</label>
+
+            <input
+                type="date"
+                name="due_date"
+                value="{% if task.due_date %}{{ task.due_date.strftime('%Y-%m-%d') }}{% endif %}"
+            >
+
+            <button
+                type="submit"
+                class="teacher-primary-button"
+            >
+                💾 Update Task
+            </button>
+
+        </form>
+
+    </section>
+
+</div>
+
+</body>
+</html>

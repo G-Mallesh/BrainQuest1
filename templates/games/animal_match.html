@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Animal Match | BrainQuest</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: #222;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: auto;
+            padding: 25px;
+        }
+
+        .game-box {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        }
+
+        h1 {
+            text-align: center;
+            color: #0f766e;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            padding: 12px 20px;
+            border-radius: 12px;
+            background: #f0fdf4;
+            font-weight: bold;
+        }
+
+        .score {
+            color: #15803d;
+        }
+
+        .question {
+            text-align: center;
+            background: #ecfeff;
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .animal {
+            font-size: 100px;
+            margin: 10px;
+        }
+
+        .question h2 {
+            margin: 10px 0;
+            color: #115e59;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .option {
+            border: 3px solid #d1d5db;
+            background: white;
+            padding: 18px;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option:hover {
+            transform: translateY(-3px);
+            border-color: #14b8a6;
+            background: #f0fdfa;
+        }
+
+        .option.correct {
+            background: #0acd4e;
+            border-color: #22c55e;
+            color: #166534;
+        }
+
+        .option.wrong {
+            background: #d74343;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        .option:disabled {
+            cursor: not-allowed;
+        }
+
+        .message {
+            text-align: center;
+            min-height: 35px;
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .next-btn,
+        .restart-btn {
+            border: none;
+            padding: 13px 24px;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        .next-btn {
+            background: #0f766e;
+        }
+
+        .restart-btn {
+            background: #2563eb;
+        }
+
+        .next-btn:hover {
+            background: #115e59;
+        }
+
+        .restart-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .button-area {
+            text-align: center;
+        }
+
+        .result {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: #f0fdf4;
+            border-radius: 20px;
+        }
+
+        .result h2 {
+            color: #15803d;
+            font-size: 32px;
+        }
+
+        .result-score {
+            font-size: 25px;
+            font-weight: bold;
+            margin: 15px;
+        }
+
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 15px;
+        }
+
+        .instructions h3 {
+            color: #0f766e;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            background: #111827;
+            color: white;
+            padding: 13px 22px;
+            border-radius: 12px;
+        }
+
+        @media (max-width: 650px) {
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+
+            .animal {
+                font-size: 75px;
+            }
+
+            .game-box {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="game-box">
+
+        <h1>🐾 Animal Match</h1>
+
+        <p class="subtitle">
+            Identify the correct animal!
+        </p>
+
+        <div class="top-bar">
+
+            <div class="stat">
+                📝 Question:
+                <span id="questionNumber">1</span>/10
+            </div>
+
+            <div class="stat score">
+                ⭐ Score:
+                <span id="score">0</span>
+            </div>
+
+        </div>
+
+
+        <!-- GAME AREA -->
+
+        <div id="gameArea">
+
+            <div class="question">
+
+                <div id="animal" class="animal">
+                    🦁
+                </div>
+
+                <h2 id="questionText">
+                    Which animal is this?
+                </h2>
+
+            </div>
+
+
+            <div id="options" class="options"></div>
+
+
+            <div id="message" class="message"></div>
+
+
+            <div class="button-area">
+
+                <button
+                    id="nextButton"
+                    class="next-btn"
+                    onclick="nextQuestion()"
+                    style="display:none;"
+                >
+                    Next Question ➡️
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- RESULT -->
+
+        <div id="result" class="result">
+
+            <h2>🎉 Game Completed!</h2>
+
+            <div class="result-score">
+                ⭐ Your Score:
+                <span id="finalScore">0</span>
+            </div>
+
+            <p>
+                Great job! Keep learning about animals. 🐾
+            </p>
+
+            <button
+                class="restart-btn"
+                onclick="startGame()"
+            >
+                🔄 Play Again
+            </button>
+
+        </div>
+
+
+        <!-- INSTRUCTIONS -->
+
+        <div class="instructions">
+
+            <h3>🎮 How to Play</h3>
+
+            <ul>
+                <li>Look at the animal emoji.</li>
+                <li>Select the correct animal name.</li>
+                <li>Each correct answer gives <strong>15 points</strong>.</li>
+                <li>There are 10 questions.</li>
+                <li>Try to get the highest score!</li>
+            </ul>
+
+        </div>
+
+
+        <div style="text-align:center;">
+
+            <a
+                href="{{ url_for('games') }}"
+                class="back"
+            >
+                ⬅️ Back to Games
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const questions = [
+
+    {
+        animal: "🦁",
+        question: "Which animal is this?",
+        options: ["Lion", "Tiger", "Elephant", "Monkey"],
+        answer: "Lion"
+    },
+
+    {
+        animal: "🐘",
+        question: "Which animal is this?",
+        options: ["Horse", "Elephant", "Cow", "Dog"],
+        answer: "Elephant"
+    },
+
+    {
+        animal: "🐯",
+        question: "Which animal is this?",
+        options: ["Tiger", "Lion", "Cat", "Fox"],
+        answer: "Tiger"
+    },
+
+    {
+        animal: "🐒",
+        question: "Which animal is this?",
+        options: ["Monkey", "Bear", "Wolf", "Rabbit"],
+        answer: "Monkey"
+    },
+
+    {
+        animal: "🐼",
+        question: "Which animal is this?",
+        options: ["Panda", "Koala", "Bear", "Dog"],
+        answer: "Panda"
+    },
+
+    {
+        animal: "🐶",
+        question: "Which animal is this?",
+        options: ["Cat", "Dog", "Fox", "Wolf"],
+        answer: "Dog"
+    },
+
+    {
+        animal: "🐱",
+        question: "Which animal is this?",
+        options: ["Tiger", "Cat", "Lion", "Leopard"],
+        answer: "Cat"
+    },
+
+    {
+        animal: "🐰",
+        question: "Which animal is this?",
+        options: ["Rabbit", "Mouse", "Deer", "Goat"],
+        answer: "Rabbit"
+    },
+
+    {
+        animal: "🐸",
+        question: "Which animal is this?",
+        options: ["Snake", "Frog", "Lizard", "Turtle"],
+        answer: "Frog"
+    },
+
+    {
+        animal: "🦋",
+        question: "Which animal is this?",
+        options: ["Bee", "Bird", "Butterfly", "Fly"],
+        answer: "Butterfly"
+    }
+
+];
+
+
+let currentQuestion = 0;
+let score = 0;
+let answered = false;
+
+
+function startGame() {
+
+    currentQuestion = 0;
+    score = 0;
+    answered = false;
+
+    document.getElementById("score").textContent = score;
+
+    document.getElementById("gameArea").style.display = "block";
+
+    document.getElementById("result").style.display = "none";
+
+    loadQuestion();
+}
+
+
+function loadQuestion() {
+
+    answered = false;
+
+    const q = questions[currentQuestion];
+
+    document.getElementById("questionNumber").textContent =
+        currentQuestion + 1;
+
+    document.getElementById("animal").textContent =
+        q.animal;
+
+    document.getElementById("questionText").textContent =
+        q.question;
+
+    document.getElementById("message").textContent = "";
+
+    document.getElementById("nextButton").style.display =
+        "none";
+
+
+    const optionsContainer =
+        document.getElementById("options");
+
+    optionsContainer.innerHTML = "";
+
+
+    q.options.forEach(option => {
+
+        const button =
+            document.createElement("button");
+
+        button.className = "option";
+
+        button.textContent = option;
+
+        button.onclick = function() {
+
+            checkAnswer(button, option);
+
+        };
+
+        optionsContainer.appendChild(button);
+
+    });
+
+}
+
+
+function checkAnswer(button, selectedAnswer) {
+
+    if (answered) {
+        return;
+    }
+
+    answered = true;
+
+    const correctAnswer =
+        questions[currentQuestion].answer;
+
+    const buttons =
+        document.querySelectorAll(".option");
+
+
+    buttons.forEach(btn => {
+
+        btn.disabled = true;
+
+        if (btn.textContent === correctAnswer) {
+
+            btn.classList.add("correct");
+
+        }
+
+    });
+
+
+    if (selectedAnswer === correctAnswer) {
+
+        button.classList.add("correct");
+
+        score += 15;
+
+        document.getElementById("score").textContent =
+            score;
+
+        document.getElementById("message").textContent =
+            "🎉 Correct! +15 points";
+
+    } else {
+
+        button.classList.add("wrong");
+
+        document.getElementById("message").textContent =
+            "❌ Wrong answer. Try the next question.";
+
+    }
+
+
+    if (currentQuestion < questions.length - 1) {
+
+        document.getElementById("nextButton").style.display =
+            "inline-block";
+
+    } else {
+
+        setTimeout(showResult, 800);
+
+    }
+
+}
+
+
+function nextQuestion() {
+
+    if (currentQuestion < questions.length - 1) {
+
+        currentQuestion++;
+
+        loadQuestion();
+
+    }
+
+}
+
+
+function showResult() {
+
+    document.getElementById("gameArea").style.display =
+        "none";
+
+    document.getElementById("result").style.display =
+        "block";
+
+    document.getElementById("finalScore").textContent =
+        score;
+
+}
+
+
+startGame();
+
+</script>
+
+</body>
+</html>

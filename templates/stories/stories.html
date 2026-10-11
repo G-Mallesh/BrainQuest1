@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Story World - BrainQuest Kids
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="story-container">
+
+
+    <!-- Header -->
+
+    <div class="story-header">
+
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+        <h1>
+            📖 Story World
+        </h1>
+
+        <span>
+            {{ class_name }}
+        </span>
+
+    </div>
+
+
+    <!-- Introduction -->
+
+    <div class="story-intro">
+
+        <h2>
+            🌟 Welcome to Story World!
+        </h2>
+
+        <p>
+            Read interesting stories,
+            learn new ideas and earn XP.
+        </p>
+
+    </div>
+
+
+    <!-- Categories -->
+
+    <div class="story-categories">
+
+        <a
+            href="{{ url_for('stories') }}"
+            class="{% if not selected_category %}
+                    active
+                   {% endif %}"
+        >
+            📚 All
+        </a>
+
+
+        <a
+            href="{{ url_for(
+                'stories',
+                category='animal'
+            ) }}"
+            class="{% if selected_category == 'animal' %}
+                    active
+                   {% endif %}"
+        >
+            🐯 Animals
+        </a>
+
+
+        <a
+            href="{{ url_for(
+                'stories',
+                category='moral'
+            ) }}"
+            class="{% if selected_category == 'moral' %}
+                    active
+                   {% endif %}"
+        >
+            ❤️ Moral
+        </a>
+
+
+        <a
+            href="{{ url_for(
+                'stories',
+                category='science'
+            ) }}"
+            class="{% if selected_category == 'science' %}
+                    active
+                   {% endif %}"
+        >
+            🔬 Science
+        </a>
+
+
+        <a
+            href="{{ url_for(
+                'stories',
+                category='adventure'
+            ) }}"
+            class="{% if selected_category == 'adventure' %}
+                    active
+                   {% endif %}"
+        >
+            🗺️ Adventure
+        </a>
+
+
+        <a
+            href="{{ url_for(
+                'stories',
+                category='educational'
+            ) }}"
+            class="{% if selected_category == 'educational' %}
+                    active
+                   {% endif %}"
+        >
+            🎓 Educational
+        </a>
+
+    </div>
+
+
+    <!-- Story Cards -->
+
+    <div class="story-grid">
+
+        {% for story in stories %}
+
+        <div class="story-card">
+
+
+            <!-- Cover -->
+
+            <div class="story-cover">
+
+                {% if story.cover_image %}
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename=story.cover_image
+                    ) }}"
+                    alt="{{ story.title }}"
+                >
+
+                {% else %}
+
+                <div class="default-story-cover">
+                    📖
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- Content -->
+
+            <div class="story-content">
+
+                <h2>
+                    {{ story.title }}
+                </h2>
+
+                <span class="story-category">
+
+                    {{ story.category|capitalize }}
+
+                </span>
+
+                <p>
+                    {{ story.description or
+                       "An interesting story for students." }}
+                </p>
+
+                {% if story.reading_time %}
+
+                <small>
+                    ⏱️
+                    {{ story.reading_time }}
+                    minutes
+                </small>
+
+                {% endif %}
+
+
+                <a
+                    href="{{ url_for(
+                        'read_story',
+                        story_id=story.id
+                    ) }}"
+                    class="story-button"
+                >
+                    📖 Read Story
+                </a>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <div class="no-stories">
+
+            <h2>
+                📖 No stories available
+            </h2>
+
+            <p>
+                New stories will be added soon.
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

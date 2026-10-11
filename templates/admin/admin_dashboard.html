@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>BrainQuest Admin</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+
+</head>
+
+<body>
+
+<div class="admin-container">
+
+    <header class="admin-header">
+
+        <div>
+            <h1>🛡️ BrainQuest Admin</h1>
+
+            <p>
+                Manage the complete learning platform
+            </p>
+        </div>
+
+        <a
+            href="{{ url_for('logout') }}"
+            class="delete-button"
+        >
+            Logout
+        </a>
+
+    </header>
+
+
+    <section class="admin-stats">
+
+        <div class="admin-stat-card">
+            <span>👨‍🎓</span>
+            <h3>Students</h3>
+            <strong>{{ total_students }}</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>👨‍🏫</span>
+            <h3>Teachers</h3>
+            <strong>{{ total_teachers }}</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>🏫</span>
+            <h3>Classes</h3>
+            <strong>{{ total_classes }}</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>🎮</span>
+            <h3>Games</h3>
+            <strong>{{ total_games }}</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>❓</span>
+            <h3>Questions</h3>
+            <strong>{{ total_questions }}</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>📖</span>
+            <h3>Stories</h3>
+            <strong>{{ total_stories }}</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>🎬</span>
+            <h3>Videos</h3>
+            <strong>{{ total_videos }}</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>📝</span>
+            <h3>Tasks</h3>
+            <strong>{{ total_tasks }}</strong>
+        </div>
+
+        <div class="admin-stat-card">
+            <span>🏆</span>
+            <h3>Badges</h3>
+            <strong>{{ total_badges }}</strong>
+        </div>
+
+    </section>
+
+
+    <section class="admin-management">
+
+        <h2>⚙️ Management</h2>
+
+        <div class="admin-grid">
+
+            <a href="{{ url_for('admin_students') }}"
+               class="admin-card">
+                👨‍🎓
+                <h3>Students</h3>
+                <p>Manage student accounts</p>
+            </a>
+
+            <a href="{{ url_for('admin_teachers') }}"
+               class="admin-card">
+                👨‍🏫
+                <h3>Teachers</h3>
+                <p>Manage teacher accounts</p>
+            </a>
+
+            <a href="{{ url_for('admin_classes') }}"
+               class="admin-card">
+                🏫
+                <h3>Classes</h3>
+                <p>Manage classes</p>
+            </a>
+
+            <a href="{{ url_for('admin_games') }}"
+               class="admin-card">
+                🎮
+                <h3>Games</h3>
+                <p>Manage learning games</p>
+            </a>
+
+            <a href="{{ url_for('admin_questions') }}"
+               class="admin-card">
+                ❓
+                <h3>Questions</h3>
+                <p>Manage quiz questions</p>
+            </a>
+
+            <a href="{{ url_for('admin_stories') }}"
+               class="admin-card">
+                📖
+                <h3>Stories</h3>
+                <p>Manage stories</p>
+            </a>
+
+            <a href="{{ url_for('admin_videos') }}"
+               class="admin-card">
+                🎬
+                <h3>Videos</h3>
+                <p>Manage educational videos</p>
+            </a>
+
+            <a href="{{ url_for('admin_tasks') }}"
+               class="admin-card">
+                📝
+                <h3>Tasks</h3>
+                <p>Manage daily tasks</p>
+            </a>
+
+            <a href="{{ url_for('admin_badges') }}"
+               class="admin-card">
+                🏆
+                <h3>Badges</h3>
+                <p>Manage rewards</p>
+            </a>
+
+            <a href="{{ url_for('admin_reports') }}"
+               class="admin-card">
+                📊
+                <h3>Reports</h3>
+                <p>View platform reports</p>
+            </a>
+
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+</html>

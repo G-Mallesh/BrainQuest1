@@ -1,0 +1,32 @@
+<h1>🏫 Classes</h1>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<a href="{{ url_for('admin_dashboard') }}">
+    ← Admin Dashboard
+</a>
+
+<br><br>
+
+<div class="admin-grid">
+
+{% for item in classes %}
+
+    <div class="admin-card">
+
+        <h2>
+            {{ item.class_name }}
+        </h2>
+
+        <p>
+            Level:
+            {{ item.education_level }}
+        </p>
+
+        <p>
+            {{ item.description or '' }}
+        </p>
+
+    </div>
+
+{% endfor %}
+
+</div>

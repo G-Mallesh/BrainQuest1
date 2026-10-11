@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Video Zone - BrainQuest Kids</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="video-container">
+
+    <!-- Header -->
+
+    <div class="video-header">
+
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+        <h1>🎬 Video Zone</h1>
+
+        <span>
+            {{ class_name }}
+        </span>
+
+    </div>
+
+
+    <!-- Introduction -->
+
+    <div class="video-intro">
+
+        <h2>
+            🎥 Learn Through Videos
+        </h2>
+
+        <p>
+            Watch educational videos,
+            stories, animals and creative lessons.
+        </p>
+
+    </div>
+
+
+    <!-- Categories -->
+
+    <div class="video-categories">
+
+        <a href="{{ url_for('videos') }}"
+           class="{% if not selected_category %}
+                  active
+                  {% endif %}">
+            🎬 All
+        </a>
+
+        <a href="{{ url_for(
+            'videos',
+            category='education'
+        ) }}"
+           class="{% if selected_category == 'education' %}
+                  active
+                  {% endif %}">
+            📚 Education
+        </a>
+
+        <a href="{{ url_for(
+            'videos',
+            category='animal'
+        ) }}"
+           class="{% if selected_category == 'animal' %}
+                  active
+                  {% endif %}">
+            🐯 Animals
+        </a>
+
+        <a href="{{ url_for(
+            'videos',
+            category='story'
+        ) }}"
+           class="{% if selected_category == 'story' %}
+                  active
+                  {% endif %}">
+            📖 Stories
+        </a>
+
+        <a href="{{ url_for(
+            'videos',
+            category='drawing'
+        ) }}"
+           class="{% if selected_category == 'drawing' %}
+                  active
+                  {% endif %}">
+            🎨 Drawing
+        </a>
+
+        <a href="{{ url_for(
+            'videos',
+            category='game'
+        ) }}"
+           class="{% if selected_category == 'game' %}
+                  active
+                  {% endif %}">
+            🎮 Games
+        </a>
+
+    </div>
+
+
+    <!-- Videos -->
+
+    <div class="video-grid">
+
+        {% for video in videos %}
+
+        <div class="video-card">
+
+
+            <!-- Thumbnail -->
+
+            <div class="video-thumbnail">
+
+                {% if video.thumbnail_path %}
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename=video.thumbnail_path
+                    ) }}"
+                    alt="{{ video.title }}"
+                >
+
+                {% else %}
+
+                <div class="default-video-image">
+                    🎬
+                </div>
+
+                {% endif %}
+
+
+                <div class="play-icon">
+                    ▶
+                </div>
+
+            </div>
+
+
+            <!-- Information -->
+
+            <div class="video-content">
+
+                <h2>
+                    {{ video.title }}
+                </h2>
+
+                <p>
+                    {{ video.description or
+                       "Educational video for students." }}
+                </p>
+
+                <span class="video-type">
+                    {{ video.video_type|capitalize }}
+                </span>
+
+
+                <a
+                    href="{{ url_for(
+                        'watch_video',
+                        video_id=video.id
+                    ) }}"
+                    class="video-button"
+                >
+                    ▶ Watch Video
+                </a>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <div class="no-videos">
+
+            <h2>
+                🎬 No videos available
+            </h2>
+
+            <p>
+                Videos will be added soon.
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

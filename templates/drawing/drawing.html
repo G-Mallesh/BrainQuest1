@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Paint & Drawing</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="drawing-container">
+
+    <!-- HEADER -->
+
+    <div class="drawing-header">
+
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+        <h1>🎨 Paint & Drawing</h1>
+
+        <a href="{{ url_for('drawing_diagrams') }}">
+            📐 Diagrams
+        </a>
+
+    </div>
+
+
+    <!-- TOOLBAR -->
+
+    <div class="drawing-toolbar">
+
+        <button
+            type="button"
+            onclick="setTool('pencil')">
+            ✏️ Pencil
+        </button>
+
+
+        <button
+            type="button"
+            onclick="setTool('brush')">
+            🖌️ Brush
+        </button>
+
+
+        <button
+            type="button"
+            onclick="setTool('eraser')">
+            🧽 Eraser
+        </button>
+
+
+        <label>
+            🎨 Color
+
+            <input
+                type="color"
+                id="colorPicker"
+                value="#000000"
+            >
+        </label>
+
+
+        <label>
+            📏 Size
+
+            <input
+                type="range"
+                id="brushSize"
+                min="1"
+                max="40"
+                value="5"
+            >
+
+            <span id="sizeValue">
+                5
+            </span>
+        </label>
+
+
+        <button
+            type="button"
+            onclick="undoDrawing()">
+            ↩️ Undo
+        </button>
+
+
+        <button
+            type="button"
+            onclick="clearCanvas()">
+            🗑️ Clear
+        </button>
+
+    </div>
+
+
+    <!-- DRAWING TITLE -->
+
+    <div class="drawing-title">
+
+        <input
+            type="text"
+            id="drawingTitle"
+            placeholder="Enter drawing title"
+            maxlength="100"
+        >
+
+    </div>
+
+
+    <!-- CANVAS -->
+
+    <div class="canvas-wrapper">
+
+        <canvas
+            id="drawingCanvas"
+            width="1000"
+            height="600">
+        </canvas>
+
+    </div>
+
+
+    <!-- SAVE -->
+
+    <div class="drawing-actions">
+
+        <button
+            type="button"
+            onclick="saveDrawing()">
+            💾 Save Drawing
+        </button>
+
+        <span id="saveMessage"></span>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const canvas =
+    document.getElementById(
+        "drawingCanvas"
+    );
+
+const ctx =
+    canvas.getContext("2d");
+
+
+const colorPicker =
+    document.getElementById(
+        "colorPicker"
+    );
+
+
+const brushSize =
+    document.getElementById(
+        "brushSize"
+    );
+
+
+const sizeValue =
+    document.getElementById(
+        "sizeValue"
+    );
+
+
+let drawing = false;
+
+let currentTool = "pencil";
+
+let history = [];
+
+
+/* =========================================
+   INITIAL CANVAS
+========================================= */
+
+function initializeCanvas() {
+
+    ctx.fillStyle = "white";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    saveHistory();
+
+}
+
+
+initializeCanvas();
+
+
+/* =========================================
+   TOOL
+========================================= */
+
+function setTool(tool) {
+
+    currentTool = tool;
+
+}
+
+
+/* =========================================
+   BRUSH SIZE
+========================================= */
+
+brushSize.addEventListener(
+    "input",
+    function() {
+
+        sizeValue.textContent =
+            brushSize.value;
+
+    }
+);
+
+
+/* =========================================
+   GET POSITION
+========================================= */
+
+function getPosition(event) {
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+
+    let clientX;
+
+    let clientY;
+
+
+    if (
+        event.touches &&
+        event.touches.length > 0
+    ) {
+
+        clientX =
+            event.touches[0].clientX;
+
+        clientY =
+            event.touches[0].clientY;
+
+    } else {
+
+        clientX =
+            event.clientX;
+
+        clientY =
+            event.clientY;
+
+    }
+
+
+    return {
+
+        x:
+            (clientX - rect.left)
+            *
+            (canvas.width / rect.width),
+
+        y:
+            (clientY - rect.top)
+            *
+            (canvas.height / rect.height)
+
+    };
+
+}
+
+
+/* =========================================
+   START DRAW
+========================================= */
+
+function startDrawing(event) {
+
+    event.preventDefault();
+
+    drawing = true;
+
+    const position =
+        getPosition(event);
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        position.x,
+        position.y
+    );
+
+}
+
+
+/* =========================================
+   DRAW
+========================================= */
+
+function draw(event) {
+
+    if (!drawing) {
+        return;
+    }
+
+
+    event.preventDefault();
+
+
+    const position =
+        getPosition(event);
+
+
+    ctx.lineWidth =
+        brushSize.value;
+
+
+    ctx.lineCap = "round";
+
+
+    if (currentTool === "eraser") {
+
+        ctx.strokeStyle = "white";
+
+    } else {
+
+        ctx.strokeStyle =
+            colorPicker.value;
+
+    }
+
+
+    if (currentTool === "pencil") {
+
+        ctx.lineWidth =
+            Math.min(
+                brushSize.value,
+                5
+            );
+
+    }
+
+
+    if (currentTool === "brush") {
+
+        ctx.lineWidth =
+            brushSize.value;
+
+    }
+
+
+    ctx.lineTo(
+        position.x,
+        position.y
+    );
+
+
+    ctx.stroke();
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        position.x,
+        position.y
+    );
+
+}
+
+
+/* =========================================
+   STOP DRAW
+========================================= */
+
+function stopDrawing() {
+
+    if (!drawing) {
+        return;
+    }
+
+
+    drawing = false;
+
+    ctx.beginPath();
+
+    saveHistory();
+
+}
+
+
+/* =========================================
+   MOUSE EVENTS
+========================================= */
+
+canvas.addEventListener(
+    "mousedown",
+    startDrawing
+);
+
+canvas.addEventListener(
+    "mousemove",
+    draw
+);
+
+canvas.addEventListener(
+    "mouseup",
+    stopDrawing
+);
+
+canvas.addEventListener(
+    "mouseleave",
+    stopDrawing
+);
+
+
+/* =========================================
+   TOUCH EVENTS
+========================================= */
+
+canvas.addEventListener(
+    "touchstart",
+    startDrawing,
+    { passive: false }
+);
+
+canvas.addEventListener(
+    "touchmove",
+    draw,
+    { passive: false }
+);
+
+canvas.addEventListener(
+    "touchend",
+    stopDrawing
+);
+
+
+/* =========================================
+   HISTORY
+========================================= */
+
+function saveHistory() {
+
+    history.push(
+        canvas.toDataURL()
+    );
+
+
+    if (history.length > 20) {
+
+        history.shift();
+
+    }
+
+}
+
+
+/* =========================================
+   UNDO
+========================================= */
+
+function undoDrawing() {
+
+    if (history.length <= 1) {
+
+        clearCanvas();
+
+        return;
+
+    }
+
+
+    history.pop();
+
+
+    const previous =
+        history[history.length - 1];
+
+
+    const image =
+        new Image();
+
+
+    image.onload = function() {
+
+        ctx.clearRect(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+
+        ctx.drawImage(
+            image,
+            0,
+            0
+        );
+
+    };
+
+
+    image.src = previous;
+
+}
+
+
+/* =========================================
+   CLEAR
+========================================= */
+
+function clearCanvas() {
+
+    ctx.fillStyle = "white";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    saveHistory();
+
+}
+
+
+/* =========================================
+   SAVE DRAWING
+========================================= */
+
+function saveDrawing() {
+
+    const title =
+        document.getElementById(
+            "drawingTitle"
+        ).value.trim();
+
+
+    if (!title) {
+
+        alert(
+            "Please enter a drawing title."
+        );
+
+        return;
+
+    }
+
+
+    const imageData =
+        canvas.toDataURL(
+            "image/png"
+        );
+
+
+    fetch(
+        "{{ url_for('save_drawing') }}",
+        {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+
+            body: JSON.stringify({
+
+                title: title,
+
+                drawing_data:
+                    imageData
+
+            })
+
+        }
+    )
+    .then(response =>
+        response.json()
+    )
+    .then(data => {
+
+        const message =
+            document.getElementById(
+                "saveMessage"
+            );
+
+
+        if (data.success) {
+
+            message.textContent =
+                "✅ Drawing saved successfully!";
+
+        } else {
+
+            message.textContent =
+                "❌ " + data.message;
+
+        }
+
+    })
+    .catch(error => {
+
+        console.error(error);
+
+        document.getElementById(
+            "saveMessage"
+        ).textContent =
+            "❌ Unable to save drawing.";
+
+    });
+
+}
+
+</script>
+
+</body>
+
+</html>

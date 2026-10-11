@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Student Progress</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+
+</head>
+
+<body>
+
+<div class="teacher-container">
+
+    <div class="teacher-header">
+
+        <div>
+
+            <h1>📊 Student Progress</h1>
+
+            <p>
+                {{ student.full_name }}
+            </p>
+
+        </div>
+
+        <a
+            href="{{ url_for('teacher_students') }}"
+            class="teacher-primary-button"
+        >
+            ← Students
+        </a>
+
+    </div>
+
+
+    <section class="teacher-stats">
+
+        <div class="teacher-stat-card">
+
+            <div class="teacher-stat-icon">
+                ⭐
+            </div>
+
+            <h3>XP</h3>
+
+            <p>
+                {{ xp.total_xp if xp else 0 }}
+            </p>
+
+        </div>
+
+
+        <div class="teacher-stat-card">
+
+            <div class="teacher-stat-icon">
+                🏆
+            </div>
+
+            <h3>Level</h3>
+
+            <p>
+                {{ xp.current_level if xp else 1 }}
+            </p>
+
+        </div>
+
+
+        <div class="teacher-stat-card">
+
+            <div class="teacher-stat-icon">
+                🔥
+            </div>
+
+            <h3>Streak</h3>
+
+            <p>
+                {{ xp.current_streak if xp else 0 }}
+            </p>
+
+        </div>
+
+
+        <div class="teacher-stat-card">
+
+            <div class="teacher-stat-icon">
+                🎮
+            </div>
+
+            <h3>Games</h3>
+
+            <p>
+                {{ game_stats.games_played }}
+            </p>
+
+        </div>
+
+
+        <div class="teacher-stat-card">
+
+            <div class="teacher-stat-icon">
+                📖
+            </div>
+
+            <h3>Stories</h3>
+
+            <p>
+                {{ story_stats.completed_stories }}
+            </p>
+
+        </div>
+
+
+        <div class="teacher-stat-card">
+
+            <div class="teacher-stat-icon">
+                🎬
+            </div>
+
+            <h3>Videos</h3>
+
+            <p>
+                {{ video_stats.completed_videos }}
+            </p>
+
+        </div>
+
+
+        <div class="teacher-stat-card">
+
+            <div class="teacher-stat-icon">
+                🎨
+            </div>
+
+            <h3>Drawings</h3>
+
+            <p>
+                {{ drawing_stats.drawings }}
+            </p>
+
+        </div>
+
+
+        <div class="teacher-stat-card">
+
+            <div class="teacher-stat-icon">
+                🥇
+            </div>
+
+            <h3>Badges</h3>
+
+            <p>
+                {{ badge_stats.badges }}
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <section class="teacher-section">
+
+        <h2>👨‍🎓 Student Information</h2>
+
+        <div class="teacher-content-card">
+
+            <p>
+                <strong>Name:</strong>
+                {{ student.full_name }}
+            </p>
+
+            <p>
+                <strong>Email:</strong>
+                {{ student.email }}
+            </p>
+
+            <p>
+                <strong>Class:</strong>
+                {{ student.class_name or 'Not Selected' }}
+            </p>
+
+            <p>
+                <strong>Level:</strong>
+                {{ student.education_level or '-' }}
+            </p>
+
+            <p>
+                <strong>City:</strong>
+                {{ student.city or '-' }}
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <section class="teacher-section">
+
+        <h2>📚 Subject Progress</h2>
+
+        {% if progress %}
+
+        <div class="student-table-wrapper">
+
+            <table class="student-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Subject</th>
+                        <th>Activities</th>
+                        <th>Completed</th>
+                        <th>Total Score</th>
+                        <th>Average</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% for item in progress %}
+
+                    <tr>
+
+                        <td>
+                            {{ item.subject }}
+                        </td>
+
+                        <td>
+                            {{ item.total_activities }}
+                        </td>
+
+                        <td>
+                            {{ item.completed_activities }}
+                        </td>
+
+                        <td>
+                            {{ item.total_score }}
+                        </td>
+
+                        <td>
+                            {{ "%.1f"|format(
+                                item.average_score or 0
+                            ) }}
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <p>
+            No subject progress available yet.
+        </p>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+</body>
+</html>

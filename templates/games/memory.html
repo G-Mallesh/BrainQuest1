@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Memory Sharp</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="memory-container">
+
+    <!-- Header -->
+
+    <div class="memory-header">
+
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+        <h1>🧠 Memory Sharp</h1>
+
+        <a href="{{ url_for('animals') }}">
+            🐯 Animals
+        </a>
+
+    </div>
+
+
+    <!-- Game information -->
+
+    <div class="memory-info">
+
+        <div>
+            ⏱️
+            <strong id="timer">60</strong>
+            sec
+        </div>
+
+        <div>
+            🎯 Attempts:
+            <strong id="attempts">0</strong>
+        </div>
+
+        <div>
+            🃏 Pairs:
+            <strong id="pairs">0</strong>
+            / {{ cards|length // 2 }}
+        </div>
+
+        <div>
+            ⭐ Score:
+            <strong id="score">0</strong>
+        </div>
+
+    </div>
+
+
+    <!-- Memory cards -->
+
+    <div
+        id="memoryBoard"
+        class="memory-board"
+    >
+
+        {% for card in cards %}
+
+        <div
+            class="memory-card"
+            data-id="{{ card.id }}"
+            data-value="{{ card.value }}"
+            onclick="flipCard(this)"
+        >
+
+            <div class="memory-card-inner">
+
+                <div class="memory-card-front">
+                    ❓
+                </div>
+
+                <div class="memory-card-back">
+                    {{ card.value }}
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <!-- Result -->
+
+    <div
+        id="memoryResult"
+        class="memory-result"
+        style="display:none;"
+    >
+
+        <h2>🎉 Great Job!</h2>
+
+        <p>
+            ⭐ Score:
+            <strong id="finalScore">0</strong>
+        </p>
+
+        <p>
+            🎯 Attempts:
+            <strong id="finalAttempts">0</strong>
+        </p>
+
+        <p>
+            🃏 Matched Pairs:
+            <strong id="finalPairs">0</strong>
+        </p>
+
+        <p>
+            ⏱️ Time:
+            <strong id="finalTime">0</strong>
+            seconds
+        </p>
+
+        <p>
+            ⭐ XP Earned:
+            <strong id="finalXP">0</strong>
+        </p>
+
+        <button onclick="location.reload()">
+            🔄 Play Again
+        </button>
+
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let flippedCards = [];
+
+let matchedPairs = 0;
+
+let attempts = 0;
+
+let score = 0;
+
+let timeLeft = 60;
+
+let gameFinished = false;
+
+let timer;
+
+
+/* =========================================
+   FLIP CARD
+========================================= */
+
+function flipCard(card) {
+
+    if (gameFinished) {
+        return;
+    }
+
+
+    if (
+        card.classList.contains("flipped") ||
+        card.classList.contains("matched")
+    ) {
+        return;
+    }
+
+
+    if (flippedCards.length >= 2) {
+        return;
+    }
+
+
+    card.classList.add("flipped");
+
+    flippedCards.push(card);
+
+
+    if (flippedCards.length === 2) {
+
+        attempts++;
+
+        document.getElementById(
+            "attempts"
+        ).textContent = attempts;
+
+
+        checkMatch();
+
+    }
+
+}
+
+
+/* =========================================
+   CHECK MATCH
+========================================= */
+
+function checkMatch() {
+
+    const first = flippedCards[0];
+
+    const second = flippedCards[1];
+
+
+    const firstValue =
+        first.dataset.value;
+
+
+    const secondValue =
+        second.dataset.value;
+
+
+    if (firstValue === secondValue) {
+
+        setTimeout(function() {
+
+            first.classList.add("matched");
+
+            second.classList.add("matched");
+
+
+            matchedPairs++;
+
+
+            score += 20;
+
+
+            document.getElementById(
+                "pairs"
+            ).textContent = matchedPairs;
+
+
+            document.getElementById(
+                "score"
+            ).textContent = score;
+
+
+            flippedCards = [];
+
+
+            if (
+                matchedPairs ==={{ cards|length // 2 }}
+            ) {
+
+                finishGame();
+  
+             }
+
+            }, 400);
+        }else {
+
+        setTimeout(function() {
+
+            first.classList.remove(
+                "flipped"
+            );
+
+            second.classList.remove(
+                "flipped"
+            );
+
+
+            flippedCards = [];
+
+        }, 800);
+
+    }
+
+}
+
+
+/* =========================================
+   TIMER
+========================================= */
+
+function startTimer() {
+
+    timer = setInterval(function() {
+
+        timeLeft--;
+
+
+        document.getElementById(
+            "timer"
+        ).textContent = timeLeft;
+
+
+        if (timeLeft <= 0) {
+
+            clearInterval(timer);
+
+            finishGame();
+
+        }
+
+    }, 1000);
+
+}
+
+
+/* =========================================
+   FINISH GAME
+========================================= */
+
+function finishGame() {
+
+    if (gameFinished) {
+        return;
+    }
+
+
+    gameFinished = true;
+
+
+    clearInterval(timer);
+
+
+    document.getElementById(
+        "memoryBoard"
+    ).style.display = "none";
+
+
+    document.querySelector(
+        ".memory-info"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "memoryResult"
+    ).style.display = "block";
+
+
+    document.getElementById(
+        "finalScore"
+    ).textContent = score;
+
+
+    document.getElementById(
+        "finalAttempts"
+    ).textContent = attempts;
+
+
+    document.getElementById(
+        "finalPairs"
+    ).textContent = matchedPairs;
+
+
+    document.getElementById(
+        "finalTime"
+    ).textContent =
+        60 - timeLeft;
+
+
+    document.getElementById(
+        "finalXP"
+    ).textContent = score;
+
+
+    saveMemoryScore();
+
+}
+
+
+/* =========================================
+   SAVE SCORE
+========================================= */
+
+function saveMemoryScore() {
+
+    fetch(
+        "{{ url_for('save_memory_score') }}",
+        {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+
+            body: JSON.stringify({
+
+                score: score,
+
+                matched_pairs:
+                    matchedPairs,
+
+                attempts: attempts,
+
+                time_taken:
+                    60 - timeLeft
+
+            })
+
+        }
+    )
+    .then(response =>
+        response.json()
+    )
+    .then(data =>
+        console.log(data)
+    )
+    .catch(error =>
+        console.error(error)
+    );
+
+}
+
+
+startTimer();
+
+</script>
+
+</body>
+
+</html>

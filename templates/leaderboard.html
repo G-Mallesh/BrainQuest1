@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Leaderboard</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+        }
+
+        .leaderboard {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 22px;
+            text-align: center;
+        }
+
+        .player {
+            background: white;
+            margin-top: 12px;
+            padding: 18px;
+            border-radius: 15px;
+            display: grid;
+            grid-template-columns:
+                70px 1fr 120px;
+            align-items: center;
+        }
+
+        .rank {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .name {
+            font-weight: bold;
+        }
+
+        .xp {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        @media(max-width:600px) {
+
+            .player {
+                grid-template-columns:
+                    50px 1fr 80px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="leaderboard">
+
+    <div class="header">
+
+        <h1>
+            🏆 BrainQuest Leaderboard
+        </h1>
+
+        <p>
+            Students with the highest XP
+        </p>
+
+    </div>
+
+
+    {% for student in leaderboard %}
+
+    <div class="player">
+
+        <div class="rank">
+
+            {% if loop.index == 1 %}
+                🥇
+            {% elif loop.index == 2 %}
+                🥈
+            {% elif loop.index == 3 %}
+                🥉
+            {% else %}
+                #{{ loop.index }}
+            {% endif %}
+
+        </div>
+
+
+        <div class="name">
+
+            {{ student.full_name }}
+
+            <br>
+
+            <small>
+                {{ student.class_name }}
+            </small>
+
+        </div>
+
+
+        <div class="xp">
+
+            ⭐
+            {{ student.total_xp }}
+            XP
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>General Knowledge</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="study-container">
+
+    <div class="study-header">
+
+        <a href="{{ url_for('study') }}">
+            ← Study Zone
+        </a>
+
+        <h1>🧠 General Knowledge</h1>
+
+        <span>{{ class_name }}</span>
+
+    </div>
+
+
+    <div class="lesson-grid">
+
+        <div class="lesson-card">
+
+            <h2>🌎 World</h2>
+
+            <p>
+                Countries, continents,
+                oceans and landmarks.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🇮🇳 India</h2>
+
+            <p>
+                States, cities, culture,
+                national symbols and history.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🚀 Space</h2>
+
+            <p>
+                Planets, stars, Moon
+                and space exploration.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🏆 Sports</h2>
+
+            <p>
+                Popular sports,
+                players and tournaments.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🔬 Science Facts</h2>
+
+            <p>
+                Interesting facts
+                about science and nature.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>💡 Did You Know?</h2>
+
+            <p>
+                Discover interesting
+                facts every day.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

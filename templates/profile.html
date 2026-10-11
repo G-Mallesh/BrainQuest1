@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>My Profile - BrainQuest Kids</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/profile.css'
+        ) }}"
+    >
+
+</head>
+
+<body>
+<div class="profile-info">
+
+    <h3>
+        🔗 Parent Link Code
+    </h3>
+
+    <p>
+        Give this code to your parent:
+    </p>
+
+    <div
+        style="
+            font-size:28px;
+            font-weight:bold;
+            letter-spacing:3px;
+        "
+    >
+        {{ student.child_code }}
+    </div>
+
+</div>
+<div class="profile-page">
+
+    <header class="profile-header">
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="back-button"
+        >
+            ← Dashboard
+        </a>
+
+        <h1>
+            👤 My Profile
+        </h1>
+
+        <a
+            href="{{ url_for('logout') }}"
+            class="logout-button"
+        >
+            Logout
+        </a>
+
+    </header>
+
+
+    <main class="profile-container">
+
+        <!-- PROFILE CARD -->
+
+        <section class="profile-card">
+
+            <div class="profile-photo-area">
+
+                {% if student.profile_photo %}
+
+                    <img
+                        src="{{ url_for(
+                            'uploaded_file',
+                            filename=student.profile_photo
+                        ) }}"
+                        class="profile-photo"
+                        alt="Profile Photo"
+                    >
+
+                {% else %}
+
+                    <div class="profile-placeholder">
+                        🧑‍🎓
+                    </div>
+
+                {% endif %}
+
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'upload_profile_photo'
+                    ) }}"
+                    enctype="multipart/form-data"
+                    class="photo-form"
+                >
+
+                    <label>
+                        Change Photo
+                    </label>
+
+                    <input
+                        type="file"
+                        name="profile_photo"
+                        accept="image/*"
+                        required
+                    >
+
+                    <button type="submit">
+                        Upload Photo
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <div class="profile-information">
+
+                <h2>
+                    {{ student.full_name }}
+                </h2>
+
+                <p class="role-badge">
+                    {{ student.role|capitalize }}
+                </p>
+
+
+                <div class="info-row">
+
+                    <span>
+                        📧 Email
+                    </span>
+
+                    <strong>
+                        {{ student.email }}
+                    </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span>
+                        📱 Phone
+                    </span>
+
+                    <strong>
+                        {{ student.phone or 'Not added' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span>
+                        🏙️ City
+                    </span>
+
+                    <strong>
+                        {{ student.city or 'Not added' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span>
+                        🎓 Education
+                    </span>
+
+                    <strong>
+                        {{ student.education_level or 'Student' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span>
+                        📚 Class
+                    </span>
+
+                    <strong>
+                        {{ student.class_name or 'Not assigned' }}
+                    </strong>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span>
+                        🟢 Status
+                    </span>
+
+                    <strong>
+                        {{ student.status|capitalize }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- QUICK LINKS -->
+
+        <section class="profile-links">
+
+            <h2>
+                🚀 Quick Access
+            </h2>
+
+
+            <div class="link-grid">
+
+                <a href="{{ url_for('progress') }}">
+                    📊
+                    <span>
+                        My Progress
+                    </span>
+                </a>
+
+
+                <a href="{{ url_for('tasks') }}">
+                    📝
+                    <span>
+                        My Tasks
+                    </span>
+                </a>
+
+
+                <a href="{{ url_for('games') }}">
+                    🎮
+                    <span>
+                        Learning Games
+                    </span>
+                </a>
+
+
+                <a href="{{ url_for('stories') }}">
+                    📖
+                    <span>
+                        Stories
+                    </span>
+                </a>
+
+
+                <a href="{{ url_for('videos') }}">
+                    🎬
+                    <span>
+                        Videos
+                    </span>
+                </a>
+
+
+                <a href="{{ url_for('drawing') }}">
+                    🎨
+                    <span>
+                        Drawing
+                    </span>
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+<h1>👨‍🎓 Students</h1>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<a href="{{ url_for('admin_dashboard') }}">
+    ← Admin Dashboard
+</a>
+
+<br><br>
+
+<table class="student-table">
+
+    <thead>
+
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Class</th>
+            <th>City</th>
+            <th>Status</th>
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for student in students %}
+
+        <tr>
+
+            <td>{{ student.id }}</td>
+
+            <td>{{ student.full_name }}</td>
+
+            <td>{{ student.email }}</td>
+
+            <td>{{ student.phone or '-' }}</td>
+
+            <td>{{ student.class_name or '-' }}</td>
+
+            <td>{{ student.city or '-' }}</td>
+
+            <td>{{ student.status }}</td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Computer Science</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="study-container">
+
+    <div class="study-header">
+
+        <a href="{{ url_for('study') }}">
+            ← Study Zone
+        </a>
+
+        <h1>💻 Computer Science</h1>
+
+        <span>{{ class_name }}</span>
+
+    </div>
+
+
+    <div class="lesson-grid">
+
+        <div class="lesson-card">
+
+            <h2>🖥️ Computer Basics</h2>
+
+            <p>
+                Learn about computers,
+                hardware and software.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>⌨️ Keyboard</h2>
+
+            <p>
+                Learn keyboard keys
+                and typing basics.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🌐 Internet</h2>
+
+            <p>
+                Learn websites,
+                browsers and online safety.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🧩 Algorithms</h2>
+
+            <p>
+                Learn step-by-step
+                problem solving.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🐍 Python</h2>
+
+            <p>
+                Learn programming concepts
+                using Python.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🤖 AI</h2>
+
+            <p>
+                Introduction to artificial
+                intelligence.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Quiz Result</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+        }
+
+        .result-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .result-header {
+            background: white;
+            padding: 35px;
+            border-radius: 25px;
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 60px;
+            font-weight: bold;
+        }
+
+        .result-stats {
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .stat {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 28px;
+        }
+
+        .answers {
+            margin-top: 25px;
+        }
+
+        .answer-card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 12px;
+            border-radius: 15px;
+        }
+
+        .correct {
+            border-left: 6px solid #16a34a;
+        }
+
+        .wrong {
+            border-left: 6px solid #dc2626;
+        }
+
+        .buttons {
+            margin-top: 25px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .buttons a {
+            text-decoration: none;
+            padding: 13px 22px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .dashboard {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .quiz {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        @media(max-width:600px) {
+
+            .result-stats {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="result-container">
+
+    <section class="result-header">
+
+        <h1>
+            🎉 Quiz Completed!
+        </h1>
+
+        <div class="result-score">
+
+            {{ score }}
+
+            /
+            
+            {{ total_points }}
+
+        </div>
+
+        <p>
+            Great work! Keep learning.
+        </p>
+
+
+        <div class="result-stats">
+
+            <div class="stat">
+
+                <strong>
+                    {{ correct_answers }}
+                </strong>
+
+                Correct
+
+            </div>
+
+
+            <div class="stat">
+
+                <strong>
+                    {{ wrong_answers }}
+                </strong>
+
+                Wrong
+
+            </div>
+
+
+            <div class="stat">
+
+                <strong>
+                    +{{ xp_earned }}
+                </strong>
+
+                XP Earned
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="answers">
+
+        <h2>
+            📋 Answer Review
+        </h2>
+
+
+        {% for item in results %}
+
+        <div class="
+            answer-card
+            {% if item.is_correct %}
+                correct
+            {% else %}
+                wrong
+            {% endif %}
+        ">
+
+            <h3>
+                {{ loop.index }}.
+                {{ item.question.question_text }}
+            </h3>
+
+
+            <p>
+
+                Your Answer:
+
+                <strong>
+                    {{ item.selected or 'Not answered' }}
+                </strong>
+
+            </p>
+
+
+            <p>
+
+                Correct Answer:
+
+                <strong>
+                    {{ item.correct }}
+                </strong>
+
+            </p>
+
+
+            {% if item.question.explanation %}
+
+                <p>
+                    💡
+                    {{ item.question.explanation }}
+                </p>
+
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+
+    </section>
+
+
+    <div class="buttons">
+
+        <a
+            href="{{ url_for('dashboard') }}"
+            class="dashboard"
+        >
+            🏠 Dashboard
+        </a>
+
+        <a
+            href="{{ url_for('quiz') }}"
+            class="quiz"
+        >
+            🔄 Try Again
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

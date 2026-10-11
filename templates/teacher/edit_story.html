@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Story</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="teacher-container">
+
+    <div class="teacher-header">
+
+        <h1>✏️ Edit Story</h1>
+
+        <a href="{{ url_for('teacher_stories') }}"
+           class="teacher-primary-button">
+            ← Back
+        </a>
+
+    </div>
+
+    <section class="teacher-form-section">
+
+        <form method="POST"
+              enctype="multipart/form-data"
+              class="teacher-form">
+
+            <label>Story Title</label>
+
+            <input
+                type="text"
+                name="title"
+                value="{{ story.title }}"
+                required
+            >
+
+            <label>Description</label>
+
+            <textarea name="description">{{ story.description or '' }}</textarea>
+
+            <label>Story Content</label>
+
+            <textarea
+                name="story_text"
+                rows="12"
+                required
+            >{{ story.story_text }}</textarea>
+
+            <label>Category</label>
+
+            <select name="category">
+
+                {% for value in [
+                    'animal',
+                    'cartoon',
+                    'moral',
+                    'science',
+                    'adventure',
+                    'educational',
+                    'other'
+                ] %}
+
+                <option
+                    value="{{ value }}"
+                    {% if story.category == value %}
+                    selected
+                    {% endif %}
+                >
+                    {{ value.title() }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+            <label>Class</label>
+
+            <select name="class_id">
+
+                <option value="">
+                    All Classes
+                </option>
+
+                {% for class_item in classes %}
+
+                <option
+                    value="{{ class_item.id }}"
+                    {% if story.class_id == class_item.id %}
+                    selected
+                    {% endif %}
+                >
+                    {{ class_item.class_name }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+            <label>Reading Time</label>
+
+            <input
+                type="number"
+                name="reading_time"
+                value="{{ story.reading_time or 5 }}"
+                min="1"
+            >
+
+            <input
+                type="hidden"
+                name="old_cover_image"
+                value="{{ story.cover_image or '' }}"
+            >
+
+            <label>Upload New Cover Image</label>
+
+            <input
+                type="file"
+                name="cover_file"
+                accept="image/*"
+            >
+
+            <button
+                type="submit"
+                class="teacher-primary-button"
+            >
+                💾 Update Story
+            </button>
+
+        </form>
+
+    </section>
+
+</div>
+
+</body>
+</html>

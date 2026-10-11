@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Add Story
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+    <style>
+
+        .image-upload-box {
+            margin-top: 10px;
+            padding: 20px;
+            border: 2px dashed #4f46e5;
+            border-radius: 15px;
+            background: #f8faff;
+        }
+
+        .image-upload-box input {
+            width: 100%;
+        }
+
+        #imagePreview {
+            display: none;
+            max-width: 350px;
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .preview-title {
+            display: none;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+
+        .remove-image-btn {
+            display: none;
+            margin-top: 10px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            background: #dc2626;
+            color: white;
+            cursor: pointer;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="teacher-container">
+
+    <!-- HEADER -->
+
+    <div class="teacher-header">
+
+        <h1>
+            ➕ Add Story
+        </h1>
+
+        <a href="{{ url_for(
+            'teacher_stories'
+        ) }}">
+            ← Stories
+        </a>
+
+    </div>
+
+
+    <!-- FORM -->
+
+    <section class="teacher-form-section">
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+            class="teacher-form"
+        >
+
+            <!-- STORY TITLE -->
+
+            <label>
+                Story Title
+            </label>
+
+            <input
+                type="text"
+                name="title"
+                placeholder="Enter story title"
+                required
+            >
+
+
+            <!-- DESCRIPTION -->
+
+            <label>
+                Description
+            </label>
+
+            <textarea
+                name="description"
+                rows="3"
+                placeholder="Short story description"
+            ></textarea>
+
+
+            <!-- STORY CONTENT -->
+
+            <label>
+                Story Content
+            </label>
+
+            <textarea
+                name="story_text"
+                rows="12"
+                placeholder="Write the complete story..."
+                required
+            ></textarea>
+
+
+            <!-- CATEGORY -->
+
+            <label>
+                Category
+            </label>
+
+            <select name="category">
+
+                <option value="animal">
+                    Animal
+                </option>
+
+                <option value="cartoon">
+                    Cartoon
+                </option>
+
+                <option value="moral">
+                    Moral
+                </option>
+
+                <option value="science">
+                    Science
+                </option>
+
+                <option value="adventure">
+                    Adventure
+                </option>
+
+                <option value="educational">
+                    Educational
+                </option>
+
+                <option value="other">
+                    Other
+                </option>
+
+            </select>
+
+
+            <!-- CLASS -->
+
+            <label>
+                Class
+            </label>
+
+            <select name="class_id">
+
+                <option value="">
+                    All Classes
+                </option>
+
+                {% for class_item in classes %}
+
+                <option value="{{ class_item.id }}">
+
+                    {{ class_item.class_name }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <!-- READING TIME -->
+
+            <label>
+                Reading Time
+                (minutes)
+            </label>
+
+            <input
+                type="number"
+                name="reading_time"
+                value="5"
+                min="1"
+                max="60"
+            >
+
+
+            <!-- COVER IMAGE -->
+
+            <label>
+                🖼️ Cover Image
+            </label>
+
+            <div class="image-upload-box">
+
+                <input
+                    type="file"
+                    name="cover_image"
+                    id="coverImageInput"
+                    accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+                >
+
+                <div
+                    id="previewTitle"
+                    class="preview-title"
+                >
+                    🖼️ Image Preview
+                </div>
+
+                <img
+                    id="imagePreview"
+                    alt="Story Cover Preview"
+                >
+
+                <button
+                    type="button"
+                    id="removeImageBtn"
+                    class="remove-image-btn"
+                >
+                    ❌ Remove Image
+                </button>
+
+            </div>
+
+
+            <!-- SAVE -->
+
+            <button
+                type="submit"
+                class="teacher-primary-button"
+            >
+                💾 Save Story
+            </button>
+
+        </form>
+
+    </section>
+
+</div>
+
+
+<!-- IMAGE PREVIEW SCRIPT -->
+
+<script>
+
+const imageInput =
+    document.getElementById("coverImageInput");
+
+const imagePreview =
+    document.getElementById("imagePreview");
+
+const previewTitle =
+    document.getElementById("previewTitle");
+
+const removeImageBtn =
+    document.getElementById("removeImageBtn");
+
+
+if (imageInput) {
+
+    imageInput.addEventListener(
+        "change",
+        function () {
+
+            const file = this.files[0];
+
+            if (!file) {
+
+                imagePreview.style.display = "none";
+
+                previewTitle.style.display = "none";
+
+                removeImageBtn.style.display = "none";
+
+                imagePreview.removeAttribute("src");
+
+                return;
+            }
+
+
+            /*
+             * Check image type
+             */
+
+            if (!file.type.startsWith("image/")) {
+
+                alert(
+                    "Please select a valid image file."
+                );
+
+                this.value = "";
+
+                imagePreview.style.display = "none";
+
+                previewTitle.style.display = "none";
+
+                removeImageBtn.style.display = "none";
+
+                return;
+            }
+
+
+            /*
+             * Create preview
+             */
+
+            const imageURL =
+                URL.createObjectURL(file);
+
+            imagePreview.src = imageURL;
+
+            imagePreview.style.display = "block";
+
+            previewTitle.style.display = "block";
+
+            removeImageBtn.style.display = "inline-block";
+
+        }
+    );
+
+}
+
+
+/*
+ * Remove selected image
+ */
+
+if (removeImageBtn) {
+
+    removeImageBtn.addEventListener(
+        "click",
+        function () {
+
+            imageInput.value = "";
+
+            imagePreview.removeAttribute("src");
+
+            imagePreview.style.display = "none";
+
+            previewTitle.style.display = "none";
+
+            removeImageBtn.style.display = "none";
+
+        }
+    );
+
+}
+
+</script>
+
+
+</body>
+
+</html>

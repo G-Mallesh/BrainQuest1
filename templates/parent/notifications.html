@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Parent Notifications</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .notification {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            border-left: 5px solid #7c3aed;
+        }
+
+        .unread {
+            background: #f5f3ff;
+        }
+
+        .notification h3 {
+            margin: 0 0 8px;
+        }
+
+        .notification p {
+            color: #4b5563;
+        }
+
+        .notification small {
+            color: #6b7280;
+        }
+
+        button {
+            margin-top: 10px;
+            border: none;
+            background: #7c3aed;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .empty {
+            background: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 18px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>
+            🔔 Notifications
+        </h1>
+
+        <p>
+            Stay updated about your child's
+            learning journey.
+        </p>
+
+    </div>
+
+
+    {% for notification in notifications %}
+
+    <div
+        class="
+            notification
+            {% if not notification.is_read %}
+            unread
+            {% endif %}
+        "
+    >
+
+        <h3>
+            {% if notification.notification_type
+                == 'achievement' %}
+                🏆
+            {% elif notification.notification_type
+                == 'progress' %}
+                📈
+            {% elif notification.notification_type
+                == 'task' %}
+                📝
+            {% elif notification.notification_type
+                == 'streak' %}
+                🔥
+            {% else %}
+                🔔
+            {% endif %}
+
+            {{ notification.title }}
+        </h3>
+
+
+        <p>
+            {{ notification.message }}
+        </p>
+
+
+        {% if notification.student_name %}
+
+        <strong>
+            Student:
+            {{ notification.student_name }}
+        </strong>
+
+        <br>
+
+        {% endif %}
+
+
+        <small>
+            {{ notification.created_at }}
+        </small>
+
+
+        {% if not notification.is_read %}
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'mark_parent_notification_read',
+                notification_id=notification.id
+            ) }}"
+        >
+
+            <button type="submit">
+                Mark as Read
+            </button>
+
+        </form>
+
+        {% endif %}
+
+    </div>
+
+    {% else %}
+
+    <div class="empty">
+
+        🔔
+
+        <h2>
+            No notifications
+        </h2>
+
+        <p>
+            New learning updates will appear here.
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+</body>
+
+</html>

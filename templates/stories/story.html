@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {{ story.title }} - BrainQuest Kids
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="reading-container">
+
+
+    <!-- Header -->
+
+    <div class="reading-header">
+
+        <a href="{{ url_for('stories') }}">
+            ← Story World
+        </a>
+
+        <span>
+            {{ class_name }}
+        </span>
+
+    </div>
+
+
+    <!-- Story -->
+
+    <article class="story-reader">
+
+
+        <!-- Cover -->
+
+        {% if story.cover_image %}
+
+        <img
+            src="{{ url_for(
+                'static',
+                filename=story.cover_image
+            ) }}"
+            class="story-reader-image"
+            alt="{{ story.title }}"
+        >
+
+        {% endif %}
+
+
+        <h1>
+            {{ story.title }}
+        </h1>
+
+
+        <div class="story-meta">
+
+            <span>
+                📖
+                {{ story.category|capitalize }}
+            </span>
+
+            {% if story.reading_time %}
+
+            <span>
+                ⏱️
+                {{ story.reading_time }} minutes
+            </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <p class="story-description">
+
+            {{ story.description }}
+
+        </p>
+
+
+        <!-- Story text -->
+
+        <div
+            id="storyText"
+            class="story-text"
+        >
+
+            {{ story.story_text }}
+
+        </div>
+
+
+        <!-- Complete -->
+
+        <div class="story-complete">
+
+            {% if story.completed %}
+
+                <div class="completed-message">
+
+                    ✅ Story Completed!
+
+                    <br>
+
+                    Score:
+                    {{ story.score or 0 }}
+
+                </div>
+
+            {% else %}
+
+                <button
+                    id="completeStory"
+                    class="complete-story-button"
+                >
+                    ✅ Complete Story
+                </button>
+
+                <p id="completeMessage"></p>
+
+            {% endif %}
+
+        </div>
+
+    </article>
+
+</div>
+
+
+<script>
+
+const completeButton =
+    document.getElementById(
+        "completeStory"
+    );
+
+
+// Start story when page opens
+
+fetch(
+    "{{ url_for(
+        'start_story',
+        story_id=story.id
+    ) }}",
+    {
+        method: "POST"
+    }
+);
+
+
+// Complete story
+
+if (completeButton) {
+
+    completeButton.addEventListener(
+        "click",
+        function () {
+
+            fetch(
+                "{{ url_for('complete_story',story_id=story.id
+                ) }}",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        score: 20
+                    })
+
+                }
+            )
+
+            .then(response =>
+                response.json()
+            )
+
+            .then(data => {
+
+                if (data.success) {
+
+                    document.getElementById(
+                        "completeMessage"
+                    ).innerHTML =
+                        "🎉 Story completed! "
+                        + "+"
+                        + data.xp_added
+                        + " XP";
+
+                    completeButton.disabled =
+                        true;
+
+                }
+
+            })
+
+            .catch(error => {
+
+                console.error(
+                    "Story error:",
+                    error
+                );
+
+            });
+
+        }
+    );
+
+}
+
+</script>
+
+</body>
+
+</html>

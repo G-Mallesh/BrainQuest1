@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Register - BrainQuest Kids</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="register-container">
+    <div class="register-card">
+
+        <h1>🌟 BrainQuest Kids</h1>
+        <h2>Create Student Account 👦</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="messages" role="alert">
+                    {% for category, message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST"
+              action="{{ url_for('register') }}">
+
+            <label for="full_name">Full Name *</label>
+            <input
+                type="text"
+                id="full_name"
+                name="full_name"
+                placeholder="Enter your full name"
+                autocomplete="name"
+                maxlength="100"
+                required
+            >
+
+            <label for="email">Email *</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email"
+                autocomplete="email"
+                maxlength="150"
+                required
+            >
+
+            <label for="phone">Phone</label>
+            <input
+                type="tel"
+                id="phone"
+                name="phone"
+                placeholder="Enter phone number"
+                autocomplete="tel"
+                maxlength="20"
+            >
+
+            <label for="password">Password *</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Create password"
+                minlength="6"
+                autocomplete="new-password"
+                required
+            >
+
+            <label for="education_level">Education Level *</label>
+            <select
+                name="education_level"
+                id="education_level"
+                required
+            >
+                <option value="">Select Education Level</option>
+                <option value="primary">Primary</option>
+                <option value="middle">Middle School</option>
+                <option value="secondary">Secondary</option>
+            </select>
+
+            <label for="class_id">Select Class *</label>
+            <select
+                name="class_id"
+                id="class_id"
+                required
+                disabled
+            >
+                <option value="">First select education level</option>
+            </select>
+
+            <p id="class-message"
+               aria-live="polite"></p>
+
+            <button type="submit">
+                🚀 Create Account
+            </button>
+
+        </form>
+
+        <p class="login-link">
+            Already have an account?
+            <a href="{{ url_for('login') }}">Login</a>
+        </p>
+
+    </div>
+</div>
+
+<script>
+    // Flask must pass classes as a list of dictionaries.
+    const allClasses = {{ classes | default([], true) | tojson }};
+
+    const educationLevel =
+        document.getElementById("education_level");
+
+    const classSelect =
+        document.getElementById("class_id");
+
+    const classMessage =
+        document.getElementById("class-message");
+
+    educationLevel.addEventListener("change", function () {
+        const selectedLevel = this.value;
+
+        classSelect.innerHTML = "";
+        classMessage.textContent = "";
+
+        if (!selectedLevel) {
+            classSelect.add(new Option(
+                "First select education level", ""
+            ));
+            classSelect.disabled = true;
+            return;
+        }
+
+        const filteredClasses = allClasses.filter(function (item) {
+            return String(item.education_level).toLowerCase()
+                === selectedLevel;
+        });
+
+        if (filteredClasses.length === 0) {
+            classSelect.add(new Option(
+                "No classes available", ""
+            ));
+            classSelect.disabled = true;
+            classMessage.textContent =
+                "Please contact your teacher or administrator to add classes.";
+            return;
+        }
+
+        classSelect.add(new Option("Select Class", ""));
+
+        filteredClasses.forEach(function (item) {
+            classSelect.add(new Option(
+                item.class_name,
+                item.id
+            ));
+        });
+
+        classSelect.disabled = false;
+    });
+</script>
+
+</body>
+</html>

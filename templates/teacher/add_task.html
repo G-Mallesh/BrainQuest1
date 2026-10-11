@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Add Task
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="teacher-container">
+
+    <div class="teacher-header">
+
+        <h1>
+            ➕ Add Daily Task
+        </h1>
+
+        <a href="{{ url_for(
+            'teacher_tasks'
+        ) }}">
+            ← Tasks
+        </a>
+
+    </div>
+
+
+    <section class="teacher-form-section">
+
+        <form
+            method="POST"
+            class="teacher-form"
+        >
+
+            <label>
+                Task Title
+            </label>
+
+            <input
+                type="text"
+                name="title"
+                placeholder="Daily Maths Practice"
+                required
+            >
+
+
+            <label>
+                Description
+            </label>
+
+            <textarea
+                name="description"
+                rows="4"
+                placeholder="Describe the task..."
+            ></textarea>
+
+
+            <label>
+                Task Type
+            </label>
+
+            <select name="task_type">
+
+                <option value="study">
+                    Study
+                </option>
+
+                <option value="game">
+                    Game
+                </option>
+
+                <option value="reading">
+                    Reading
+                </option>
+
+                <option value="drawing">
+                    Drawing
+                </option>
+
+                <option value="quiz">
+                    Quiz
+                </option>
+
+                <option value="video">
+                    Video
+                </option>
+
+                <option value="memory">
+                    Memory
+                </option>
+
+                <option value="creative">
+                    Creative
+                </option>
+
+                <option value="other">
+                    Other
+                </option>
+
+            </select>
+
+
+            <label>
+                Class
+            </label>
+
+            <select name="class_id">
+
+                <option value="">
+                    All Classes
+                </option>
+
+                {% for class_item in classes %}
+
+                <option value="{{ class_item.id }}">
+
+                    {{ class_item.class_name }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <label>
+                XP Points
+            </label>
+
+            <input
+                type="number"
+                name="points"
+                value="10"
+                min="1"
+                max="1000"
+            >
+
+
+            <label>
+                Due Date
+            </label>
+
+            <input
+                type="date"
+                name="due_date"
+            >
+
+
+            <button
+                type="submit"
+                class="teacher-primary-button"
+            >
+                💾 Create Task
+            </button>
+
+        </form>
+
+    </section>
+
+</div>
+
+</body>
+
+</html>

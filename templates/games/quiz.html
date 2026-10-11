@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>BrainQuest Quiz</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/games.css'
+        ) }}"
+    >
+
+    <style>
+
+        .quiz-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .quiz-header {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .timer {
+            font-size: 22px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .question-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow:
+                0 8px 25px rgba(0,0,0,0.06);
+        }
+
+        .question-number {
+            color: #7c3aed;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 15px 0 25px;
+        }
+
+        .option {
+            display: block;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .option:hover {
+            background: #f5f3ff;
+        }
+
+        .option input {
+            margin-right: 10px;
+        }
+
+        .submit-quiz {
+            width: 100%;
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            background: #7c3aed;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .question-image {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 15px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="quiz-container">
+
+    <div class="quiz-header">
+
+        <h1>
+            🧠 BrainQuest Quiz
+        </h1>
+
+        <p>
+            Answer the questions and earn XP!
+        </p>
+
+        <div
+            class="timer"
+            id="timer"
+        >
+            ⏱️ 05:00
+        </div>
+
+    </div>
+
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'submit_quiz'
+        ) }}"
+        id="quizForm"
+    >
+
+        {% for question in questions %}
+
+        <div class="question-card">
+
+            <div class="question-number">
+
+                Question {{ loop.index }}
+
+            </div>
+
+
+            <div class="question-text">
+
+                {{ question.question_text }}
+
+            </div>
+
+
+            {% if question.question_image %}
+
+                <img
+                    src="{{ url_for(
+                        'uploaded_file',
+                        filename=question.question_image
+                    ) }}"
+                    class="question-image"
+                    alt="Question image"
+                >
+
+            {% endif %}
+
+
+            <label class="option">
+
+                <input
+                    type="radio"
+                    name="question_{{ question.id }}"
+                    value="A"
+                    required
+                >
+
+                A.
+                {{ question.option_a }}
+
+            </label>
+
+
+            <label class="option">
+
+                <input
+                    type="radio"
+                    name="question_{{ question.id }}"
+                    value="B"
+                >
+
+                B.
+                {{ question.option_b }}
+
+            </label>
+
+
+            <label class="option">
+
+                <input
+                    type="radio"
+                    name="question_{{ question.id }}"
+                    value="C"
+                >
+
+                C.
+                {{ question.option_c }}
+
+            </label>
+
+
+            <label class="option">
+
+                <input
+                    type="radio"
+                    name="question_{{ question.id }}"
+                    value="D"
+                >
+
+                D.
+                {{ question.option_d }}
+
+            </label>
+
+        </div>
+
+        {% endfor %}
+
+
+        <button
+            type="submit"
+            class="submit-quiz"
+        >
+            🚀 Submit Quiz
+        </button>
+
+    </form>
+
+</div>
+
+
+<script>
+
+let timeLeft = 300;
+
+const timer =
+    document.getElementById("timer");
+
+const quizForm =
+    document.getElementById("quizForm");
+
+
+const countdown =
+    setInterval(function () {
+
+        const minutes =
+            Math.floor(timeLeft / 60);
+
+        const seconds =
+            timeLeft % 60;
+
+        timer.textContent =
+            "⏱️ " +
+            minutes +
+            ":" +
+            String(seconds)
+                .padStart(2, "0");
+
+
+        if (timeLeft <= 0) {
+
+            clearInterval(countdown);
+
+            quizForm.submit();
+
+        }
+
+        timeLeft--;
+
+    }, 1000);
+
+</script>
+
+</body>
+</html>

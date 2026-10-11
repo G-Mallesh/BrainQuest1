@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>
+    {{ video.title }} - BrainQuest Kids
+</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+
+<div class="watch-container">
+
+    <!-- Header -->
+    <div class="watch-header">
+
+        <a href="{{ url_for('videos') }}">
+            ← Video Zone
+        </a>
+
+        <span>
+            {{ class_name }}
+        </span>
+
+    </div>
+
+
+    <!-- Video -->
+    <div class="video-player-container">
+
+        <video
+            id="brainVideo"
+            controls
+            preload="metadata"
+        >
+
+            <source
+                src="{{ url_for('static', filename=video.video_path) }}"
+                type="video/mp4"
+            >
+
+            Your browser does not support
+            video playback.
+
+        </video>
+
+    </div>
+
+
+    <!-- Information -->
+    <div class="watch-info">
+
+        <h1>
+            {{ video.title }}
+        </h1>
+
+        <span class="video-type">
+            {{ video.video_type|capitalize }}
+        </span>
+
+        <p>
+            {{ video.description }}
+        </p>
+
+        <div id="videoStatus">
+            ▶ Start watching to learn.
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    const video =
+        document.getElementById("brainVideo");
+
+    const statusBox =
+        document.getElementById("videoStatus");
+
+    let lastSavedSecond = 0;
+
+    let completedSent = false;
+
+
+    /*
+     * Save progress every 10 seconds
+     */
+    video.addEventListener(
+        "timeupdate",
+        function () {
+
+            const currentTime =
+                Math.floor(video.currentTime);
+
+            if (
+                currentTime >=
+                lastSavedSecond + 10
+            ) {
+
+                lastSavedSecond =
+                    currentTime;
+
+                saveProgress(
+                    currentTime,
+                    false
+                );
+            }
+
+        }
+    );
+
+
+    /*
+     * Save completion when video ends
+     */
+    video.addEventListener(
+        "ended",
+        function () {
+
+            if (completedSent) {
+                return;
+            }
+
+            completedSent = true;
+
+            saveProgress(
+                Math.floor(video.duration),
+                true
+            );
+
+        }
+    );
+
+
+    /*
+     * Send progress to Flask
+     */
+    function saveProgress(
+        seconds,
+        completed
+    ) {
+
+        fetch(
+            "{{ url_for('save_video_progress', video_id=video.id) }}",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    watched_seconds:
+                        seconds,
+
+                    completed:
+                        completed
+
+                })
+            }
+        )
+
+        .then(response =>
+            response.json()
+        )
+
+        .then(data => {
+
+            if (
+                data.success &&
+                data.completed
+            ) {
+
+                statusBox.innerHTML =
+                    "🎉 Video completed! +" +
+                    data.xp_added +
+                    " XP";
+
+            }
+
+        })
+
+        .catch(error => {
+
+            console.error(
+                "Video progress error:",
+                error
+            );
+
+        });
+
+    }
+
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin - Tasks</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+<div class="admin-container">
+
+    <div class="admin-header">
+        <div>
+            <h1>📝 Tasks</h1>
+            <p>Manage student learning tasks.</p>
+        </div>
+
+        <a href="{{ url_for('admin_dashboard') }}">
+            ← Admin Dashboard
+        </a>
+    </div>
+
+
+    <!-- Search -->
+    <form
+        method="GET"
+        class="admin-search"
+        action="{{ url_for('admin_tasks') }}"
+    >
+
+        <input
+            type="text"
+            name="search"
+            value="{{ search }}"
+            placeholder="🔎 Search tasks..."
+        >
+
+        <button type="submit">
+            Search
+        </button>
+
+    </form>
+
+
+    <br>
+
+
+    <!-- Tasks -->
+    <div class="admin-grid">
+
+        {% for task in tasks %}
+
+        <div class="admin-card">
+
+            <h3>📝 {{ task.title }}</h3>
+
+            <p>
+                <strong>Type:</strong>
+                {{ task.task_type }}
+            </p>
+
+            <p>
+                <strong>XP:</strong>
+                {{ task.points }}
+            </p>
+
+            <p>
+                <strong>Class:</strong>
+                {{ task.class_name or 'All Classes' }}
+            </p>
+
+            <p>
+                <strong>Due:</strong>
+                {{ task.due_date or 'No deadline' }}
+            </p>
+
+            <p>
+                <strong>Status:</strong>
+                {{ task.status }}
+            </p>
+
+
+            <!-- Status -->
+            {% if task.status == 'active' %}
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'admin_task_status',
+                    task_id=task.id
+                ) }}"
+            >
+
+                <input
+                    type="hidden"
+                    name="status"
+                    value="inactive"
+                >
+
+                <button type="submit">
+                    🔴 Deactivate
+                </button>
+
+            </form>
+
+            {% else %}
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'admin_task_status',
+                    task_id=task.id
+                ) }}"
+            >
+
+                <input
+                    type="hidden"
+                    name="status"
+                    value="active"
+                >
+
+                <button type="submit">
+                    🟢 Activate
+                </button>
+
+            </form>
+
+            {% endif %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-progress">
+            📝 No tasks found.
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
+

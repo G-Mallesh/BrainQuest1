@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Science</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="study-container">
+
+    <div class="study-header">
+
+        <a href="{{ url_for('study') }}">
+            ← Study Zone
+        </a>
+
+        <h1>🔬 Science</h1>
+
+        <span>{{ class_name }}</span>
+
+    </div>
+
+
+    <div class="lesson-grid">
+
+
+        {% if class_name in
+            ['Class 1', 'Class 2', 'Class 3'] %}
+
+        <div class="lesson-card">
+
+            <h2>🌱 Plants</h2>
+
+            <p>
+                Learn about roots, stems,
+                leaves, flowers and seeds.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🐯 Animals</h2>
+
+            <p>
+                Learn about wild,
+                domestic and sea animals.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🌎 Earth</h2>
+
+            <p>
+                Learn about our planet,
+                land, water and air.
+            </p>
+
+        </div>
+
+
+        {% elif class_name in
+            ['Class 4', 'Class 5', 'Class 6'] %}
+
+        <div class="lesson-card">
+
+            <h2>💧 Water</h2>
+
+            <p>
+                Water sources, water cycle
+                and conservation.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>⚡ Energy</h2>
+
+            <p>
+                Different forms of energy
+                and their uses.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🌱 Living Things</h2>
+
+            <p>
+                Characteristics of plants
+                and animals.
+            </p>
+
+        </div>
+
+
+        {% else %}
+
+        <div class="lesson-card">
+
+            <h2>⚛️ Matter</h2>
+
+            <p>
+                Solids, liquids, gases
+                and changes of state.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🧬 Biology</h2>
+
+            <p>
+                Cells, organisms,
+                human body and life processes.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🌌 Physics</h2>
+
+            <p>
+                Motion, force, energy,
+                light and electricity.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🧪 Chemistry</h2>
+
+            <p>
+                Elements, compounds,
+                mixtures and reactions.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+        <div class="lesson-card">
+
+            <h2>🐯 Animal World</h2>
+
+            <p>
+                Explore animal facts,
+                categories and quizzes.
+            </p>
+
+            <a
+                href="{{ url_for('animals') }}"
+                class="study-button"
+            >
+                Explore Animals
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

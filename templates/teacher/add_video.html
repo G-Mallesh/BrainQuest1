@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Add Video
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+    <style>
+
+        .upload-box {
+            margin-top: 10px;
+            padding: 20px;
+            border: 2px dashed #4f46e5;
+            border-radius: 15px;
+            background: #f8faff;
+        }
+
+        .preview-title {
+            display: none;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+
+        #videoPreview {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        #thumbnailPreview {
+            display: none;
+            max-width: 350px;
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .remove-btn {
+            display: none;
+            margin-top: 10px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            background: #dc2626;
+            color: white;
+            cursor: pointer;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="teacher-container">
+
+    <!-- HEADER -->
+
+    <div class="teacher-header">
+
+        <h1>
+            ➕ Add Video
+        </h1>
+
+        <a href="{{ url_for(
+            'teacher_videos'
+        ) }}">
+            ← Videos
+        </a>
+
+    </div>
+
+
+    <!-- FORM -->
+
+    <section class="teacher-form-section">
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+            class="teacher-form"
+        >
+
+            <!-- VIDEO TITLE -->
+
+            <label>
+                Video Title
+            </label>
+
+            <input
+                type="text"
+                name="title"
+                placeholder="Enter video title"
+                required
+            >
+
+
+            <!-- DESCRIPTION -->
+
+            <label>
+                Description
+            </label>
+
+            <textarea
+                name="description"
+                rows="4"
+                placeholder="Enter video description"
+            ></textarea>
+
+
+            <!-- VIDEO FILE -->
+
+            <label>
+                🎬 Video File
+            </label>
+
+            <div class="upload-box">
+
+                <input
+                    type="file"
+                    name="video_file"
+                    id="videoInput"
+                    accept="video/mp4,video/webm,video/quicktime"
+                    required
+                >
+
+                <div
+                    id="videoPreviewTitle"
+                    class="preview-title"
+                >
+                    🎬 Video Preview
+                </div>
+
+                <video
+                    id="videoPreview"
+                    controls
+                ></video>
+
+                <button
+                    type="button"
+                    id="removeVideoBtn"
+                    class="remove-btn"
+                >
+                    ❌ Remove Video
+                </button>
+
+            </div>
+
+
+            <!-- THUMBNAIL -->
+
+            <label>
+                🖼️ Thumbnail Image
+            </label>
+
+            <div class="upload-box">
+
+                <input
+                    type="file"
+                    name="thumbnail_file"
+                    id="thumbnailInput"
+                    accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+                >
+
+                <div
+                    id="thumbnailPreviewTitle"
+                    class="preview-title"
+                >
+                    🖼️ Thumbnail Preview
+                </div>
+
+                <img
+                    id="thumbnailPreview"
+                    alt="Video Thumbnail Preview"
+                >
+
+                <button
+                    type="button"
+                    id="removeThumbnailBtn"
+                    class="remove-btn"
+                >
+                    ❌ Remove Thumbnail
+                </button>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <label>
+                Category
+            </label>
+
+            <select name="category">
+
+                <option value="education">
+                    Education
+                </option>
+
+                <option value="animal">
+                    Animal
+                </option>
+
+                <option value="story">
+                    Story
+                </option>
+
+                <option value="drawing">
+                    Drawing
+                </option>
+
+                <option value="game">
+                    Game
+                </option>
+
+                <option value="other">
+                    Other
+                </option>
+
+            </select>
+
+
+            <!-- VIDEO TYPE -->
+
+            <label>
+                Video Type
+            </label>
+
+            <select name="video_type">
+
+                <option value="education">
+                    Education
+                </option>
+
+                <option value="animal">
+                    Animal
+                </option>
+
+                <option value="story">
+                    Story
+                </option>
+
+                <option value="drawing">
+                    Drawing
+                </option>
+
+                <option value="game">
+                    Game
+                </option>
+
+                <option value="other">
+                    Other
+                </option>
+
+            </select>
+
+
+            <!-- CLASS -->
+
+            <label>
+                Class
+            </label>
+
+            <select name="class_id">
+
+                <option value="">
+                    All Classes
+                </option>
+
+                {% for class_item in classes %}
+
+                <option value="{{ class_item.id }}">
+
+                    {{ class_item.class_name }}
+
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <!-- DURATION -->
+
+            <label>
+                Duration (seconds)
+            </label>
+
+            <input
+                type="number"
+                name="duration_seconds"
+                value="0"
+                min="0"
+            >
+
+
+            <!-- SAVE -->
+
+            <button
+                type="submit"
+                class="teacher-primary-button"
+            >
+                💾 Save Video
+            </button>
+
+        </form>
+
+    </section>
+
+</div>
+
+
+<!-- VIDEO PREVIEW SCRIPT -->
+
+<script>
+
+const videoInput =
+    document.getElementById("videoInput");
+
+const videoPreview =
+    document.getElementById("videoPreview");
+
+const videoPreviewTitle =
+    document.getElementById("videoPreviewTitle");
+
+const removeVideoBtn =
+    document.getElementById("removeVideoBtn");
+
+
+if (videoInput) {
+
+    videoInput.addEventListener(
+        "change",
+        function () {
+
+            const file = this.files[0];
+
+            if (!file) {
+
+                videoPreview.style.display = "none";
+
+                videoPreviewTitle.style.display = "none";
+
+                removeVideoBtn.style.display = "none";
+
+                videoPreview.removeAttribute("src");
+
+                videoPreview.load();
+
+                return;
+            }
+
+
+            /*
+             * Validate video
+             */
+
+            if (!file.type.startsWith("video/")) {
+
+                alert(
+                    "Please select a valid video file."
+                );
+
+                this.value = "";
+
+                videoPreview.style.display = "none";
+
+                videoPreviewTitle.style.display = "none";
+
+                removeVideoBtn.style.display = "none";
+
+                return;
+            }
+
+
+            /*
+             * Create video preview
+             */
+
+            const videoURL =
+                URL.createObjectURL(file);
+
+            videoPreview.src = videoURL;
+
+            videoPreview.style.display = "block";
+
+            videoPreviewTitle.style.display = "block";
+
+            removeVideoBtn.style.display = "inline-block";
+
+        }
+    );
+
+}
+
+
+/*
+ * Remove video
+ */
+
+if (removeVideoBtn) {
+
+    removeVideoBtn.addEventListener(
+        "click",
+        function () {
+
+            videoInput.value = "";
+
+            videoPreview.removeAttribute("src");
+
+            videoPreview.load();
+
+            videoPreview.style.display = "none";
+
+            videoPreviewTitle.style.display = "none";
+
+            removeVideoBtn.style.display = "none";
+
+        }
+    );
+
+}
+
+
+/* ==========================================
+   THUMBNAIL PREVIEW
+========================================== */
+
+const thumbnailInput =
+    document.getElementById("thumbnailInput");
+
+const thumbnailPreview =
+    document.getElementById("thumbnailPreview");
+
+const thumbnailPreviewTitle =
+    document.getElementById("thumbnailPreviewTitle");
+
+const removeThumbnailBtn =
+    document.getElementById("removeThumbnailBtn");
+
+
+if (thumbnailInput) {
+
+    thumbnailInput.addEventListener(
+        "change",
+        function () {
+
+            const file = this.files[0];
+
+            if (!file) {
+
+                thumbnailPreview.style.display = "none";
+
+                thumbnailPreviewTitle.style.display = "none";
+
+                removeThumbnailBtn.style.display = "none";
+
+                thumbnailPreview.removeAttribute("src");
+
+                return;
+            }
+
+
+            /*
+             * Validate image
+             */
+
+            if (!file.type.startsWith("image/")) {
+
+                alert(
+                    "Please select a valid image file."
+                );
+
+                this.value = "";
+
+                thumbnailPreview.style.display = "none";
+
+                thumbnailPreviewTitle.style.display = "none";
+
+                removeThumbnailBtn.style.display = "none";
+
+                return;
+            }
+
+
+            /*
+             * Create thumbnail preview
+             */
+
+            const imageURL =
+                URL.createObjectURL(file);
+
+            thumbnailPreview.src = imageURL;
+
+            thumbnailPreview.style.display = "block";
+
+            thumbnailPreviewTitle.style.display = "block";
+
+            removeThumbnailBtn.style.display = "inline-block";
+
+        }
+    );
+
+}
+
+
+/*
+ * Remove thumbnail
+ */
+
+if (removeThumbnailBtn) {
+
+    removeThumbnailBtn.addEventListener(
+        "click",
+        function () {
+
+            thumbnailInput.value = "";
+
+            thumbnailPreview.removeAttribute("src");
+
+            thumbnailPreview.style.display = "none";
+
+            thumbnailPreviewTitle.style.display = "none";
+
+            removeThumbnailBtn.style.display = "none";
+
+        }
+    );
+
+}
+
+</script>
+
+
+</body>
+
+</html>

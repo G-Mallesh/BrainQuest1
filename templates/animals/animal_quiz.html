@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Animal Quiz</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="quiz-container">
+
+    <div class="quiz-header">
+
+        <a href="{{ url_for('animals') }}">
+            ← Animals
+        </a>
+
+        <h1>🧠 Guess the Animal</h1>
+
+        <span>
+            Question
+            <strong id="number">1</strong>
+            / {{ questions|length }}
+        </span>
+
+    </div>
+
+
+    <div id="quizCard"
+         class="quiz-card">
+
+        <h2>
+            Which animal is this?
+        </h2>
+
+
+        <div class="quiz-animal">
+            🐾
+        </div>
+
+
+        <div id="options"
+             class="quiz-options">
+        </div>
+
+
+        <p id="feedback"></p>
+
+    </div>
+
+
+    <div id="quizResult"
+         class="quiz-result"
+         style="display:none;">
+
+        <h2>🎉 Quiz Complete!</h2>
+
+        <p>
+            Score:
+            <strong id="quizScore"></strong>
+        </p>
+
+        <p>
+            Correct:
+            <strong id="quizCorrect"></strong>
+        </p>
+
+        <p>
+            Wrong:
+            <strong id="quizWrong"></strong>
+        </p>
+
+        <p>
+            ⭐ XP:
+            <strong id="quizXP"></strong>
+        </p>
+
+
+        <button onclick="location.reload()">
+            🔄 Play Again
+        </button>
+
+
+        <a href="{{ url_for('animals') }}">
+            🐯 Animal World
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const questions =
+    {{ questions | tojson }};
+
+let current = 0;
+
+let score = 0;
+
+let correct = 0;
+
+let wrong = 0;
+
+
+const optionsContainer =
+    document.getElementById("options");
+
+
+const feedback =
+    document.getElementById("feedback");
+
+
+function loadQuestion() {
+
+    if (current >= questions.length) {
+
+        finishQuiz();
+
+        return;
+    }
+
+
+    const question =
+        questions[current];
+
+
+    document.getElementById("number")
+        .textContent = current + 1;
+
+
+    optionsContainer.innerHTML = "";
+
+
+    question.options.forEach(
+        function(option) {
+
+            const button =
+                document.createElement("button");
+
+
+            button.textContent =
+                option.name;
+
+
+            button.onclick =
+                function() {
+
+                    checkAnswer(
+                        option.name,
+                        question.answer
+                    );
+
+                };
+
+
+            optionsContainer.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+
+function checkAnswer(
+    selected,
+    correctAnswer
+) {
+
+    const buttons =
+        optionsContainer.querySelectorAll(
+            "button"
+        );
+
+
+    buttons.forEach(
+        function(button) {
+
+            button.disabled = true;
+
+        }
+    );
+
+
+    if (
+        selected === correctAnswer
+    ) {
+
+        correct++;
+
+        score += 10;
+
+        feedback.textContent =
+            "✅ Correct! +10 XP";
+
+    } else {
+
+        wrong++;
+
+        feedback.textContent =
+            "❌ Correct answer: "
+            + correctAnswer;
+
+    }
+
+
+    setTimeout(
+        function() {
+
+            feedback.textContent = "";
+
+            current++;
+
+            loadQuestion();
+
+        },
+        900
+    );
+
+}
+
+
+function finishQuiz() {
+
+    document.getElementById(
+        "quizCard"
+    ).style.display = "none";
+
+
+    document.getElementById(
+        "quizResult"
+    ).style.display = "block";
+
+
+    document.getElementById(
+        "quizScore"
+    ).textContent = score;
+
+
+    document.getElementById(
+        "quizCorrect"
+    ).textContent = correct;
+
+
+    document.getElementById(
+        "quizWrong"
+    ).textContent = wrong;
+
+
+    document.getElementById(
+        "quizXP"
+    ).textContent = score;
+
+
+    saveQuiz();
+
+}
+
+
+function saveQuiz() {
+
+    fetch(
+        "{{ url_for('save_animal_quiz') }}",
+        {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+
+            body: JSON.stringify({
+
+                score: score,
+
+                correct: correct,
+
+                wrong: wrong
+
+            })
+
+        }
+    )
+    .then(response =>
+        response.json()
+    )
+    .then(data =>
+        console.log(data)
+    )
+    .catch(error =>
+        console.error(error)
+    );
+
+}
+
+
+loadQuestion();
+
+</script>
+
+</body>
+
+</html>

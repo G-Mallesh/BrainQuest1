@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Brain Quiz - BrainQuest</title>
+
+<style>
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+
+        font-family: Arial, sans-serif;
+
+        background: linear-gradient(
+            135deg,
+            #667eea,
+            #764ba2
+        );
+
+        min-height: 100vh;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .quiz-container {
+        width: 92%;
+        max-width: 700px;
+
+        background: whitesmoke
+        ;
+
+        padding: 35px;
+
+        border-radius: 20px;
+
+        box-shadow:
+            0 10px 30px
+            rgba(0, 0, 0, 0.25);
+    }
+
+    h1 {
+        text-align: center;
+
+        color: #333;
+
+        margin-top: 0;
+    }
+
+    .description {
+        text-align: center;
+
+        color: #666;
+    }
+
+    .quiz-info {
+        display: flex;
+
+        justify-content: space-between;
+
+        margin: 25px 0;
+
+        font-weight: bold;
+
+        color: #555;
+    }
+
+    .question {
+        background: #7a8fec;
+
+        padding: 25px;
+
+        border-radius: 15px;
+
+        font-size: 23px;
+
+        font-weight: bold;
+
+        color: #333;
+
+        margin-bottom: 20px;
+    }
+
+    .options {
+        display: grid;
+
+        gap: 12px;
+    }
+
+    .option {
+        padding: 15px;
+
+        border: 2px solid #ddd;
+
+        border-radius: 10px;
+
+        background: rgb(84, 163, 209);
+
+        cursor: pointer;
+
+        font-size: 17px;
+
+        text-align: left;
+
+        transition: 0.2s;
+    }
+
+    .option:hover {
+        border-color: #667eea;
+
+        background: #6780ef;
+    }
+
+    .option.correct {
+        background: #1bd446;
+
+        border-color: #28a745;
+
+        color: black;
+    }
+
+    .option.wrong {
+        background: #f8d7da;
+
+        border-color: #dc3545;
+
+        color: #721c24;
+    }
+
+    button {
+        display: block;
+
+        margin: 25px auto 0;
+
+        padding: 12px 28px;
+
+        border: none;
+
+        border-radius: 10px;
+
+        background: #667eea;
+
+        color: rgb(48, 41, 41);
+
+        font-size: 17px;
+
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #bdc1dc;
+    }
+
+    #message {
+        text-align: center;
+
+        margin-top: 20px;
+
+        min-height: 28px;
+
+        font-size: 20px;
+
+        font-weight: bold;
+    }
+
+    .back {
+        display: block;
+
+        text-align: center;
+
+        margin-top: 20px;
+
+        color: #667eea;
+
+        text-decoration: none;
+
+        font-weight: bold;
+    }
+
+</style>
+
+
+</head>
+
+<body>
+
+<div class="quiz-container">
+
+
+<h1>🧠 Brain Quiz</h1>
+
+<p class="description">
+    Test your knowledge and earn points!
+</p>
+
+
+<div class="quiz-info">
+
+    <span>
+        Question:
+        <span id="questionNumber">1</span>
+        /
+        <span id="totalQuestions">10</span>
+    </span>
+
+    <span>
+        ⭐ Score:
+        <span id="score">0</span>
+    </span>
+
+</div>
+
+
+<div
+    class="question"
+    id="question">
+</div>
+
+
+<div
+    class="options"
+    id="options">
+</div>
+
+
+<div id="message"></div>
+
+
+<button
+    id="nextButton"
+    onclick="nextQuestion()"
+    style="display:none;">
+    ➡️ Next Question
+</button>
+
+
+<a
+    href="{{ url_for('games') }}"
+    class="back">
+    ← Back to Games
+</a>
+```
+
+</div>
+
+<script>
+
+const questions = [
+
+    {
+        question: "What is the capital of India?",
+
+        options: [
+            "Mumbai",
+            "New Delhi",
+            "Hyderabad",
+            "Chennai"
+        ],
+
+        answer: "New Delhi"
+    },
+
+    {
+        question: "How many days are there in a week?",
+
+        options: [
+            "5",
+            "6",
+            "7",
+            "8"
+        ],
+
+        answer: "7"
+    },
+
+    {
+        question: "Which planet is known as the Red Planet?",
+
+        options: [
+            "Earth",
+            "Mars",
+            "Jupiter",
+            "Venus"
+        ],
+
+        answer: "Mars"
+    },
+
+    {
+        question: "How many sides does a triangle have?",
+
+        options: [
+            "2",
+            "3",
+            "4",
+            "5"
+        ],
+
+        answer: "3"
+    },
+
+    {
+        question: "Which animal is known as the King of the Jungle?",
+
+        options: [
+            "Tiger",
+            "Elephant",
+            "Lion",
+            "Bear"
+        ],
+
+        answer: "Lion"
+    },
+
+    {
+        question: "What is 5 + 7?",
+
+        options: [
+            "10",
+            "11",
+            "12",
+            "13"
+        ],
+
+        answer: "12"
+    },
+
+    {
+        question: "Which gas do humans need to breathe?",
+
+        options: [
+            "Carbon Dioxide",
+            "Oxygen",
+            "Hydrogen",
+            "Nitrogen"
+        ],
+
+        answer: "Oxygen"
+    },
+
+    {
+        question: "How many months are there in a year?",
+
+        options: [
+            "10",
+            "11",
+            "12",
+            "13"
+        ],
+
+        answer: "12"
+    },
+
+    {
+        question: "Which is the largest ocean?",
+
+        options: [
+            "Indian Ocean",
+            "Atlantic Ocean",
+            "Pacific Ocean",
+            "Arctic Ocean"
+        ],
+
+        answer: "Pacific Ocean"
+    },
+
+    {
+        question: "Which organ pumps blood through the body?",
+
+        options: [
+            "Brain",
+            "Lungs",
+            "Heart",
+            "Kidney"
+        ],
+
+        answer: "Heart"
+    }
+
+];
+
+
+let currentQuestion = 0;
+
+let score = 0;
+
+let answered = false;
+
+
+function loadQuestion() {
+
+    const question =
+        questions[currentQuestion];
+
+
+    document.getElementById(
+        "question"
+    ).innerText =
+        question.question;
+
+
+    document.getElementById(
+        "questionNumber"
+    ).innerText =
+        currentQuestion + 1;
+
+
+    document.getElementById(
+        "totalQuestions"
+    ).innerText =
+        questions.length;
+
+
+    const optionsContainer =
+        document.getElementById(
+            "options"
+        );
+
+
+    optionsContainer.innerHTML = "";
+
+
+    question.options.forEach(
+        option => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.className =
+                "option";
+
+
+            button.innerText =
+                option;
+
+
+            button.onclick =
+                function() {
+
+                    checkAnswer(
+                        button,
+                        option
+                    );
+
+                };
+
+
+            optionsContainer.appendChild(
+                button
+            );
+
+        }
+    );
+
+
+    document.getElementById(
+        "message"
+    ).innerText = "";
+
+
+    document.getElementById(
+        "nextButton"
+    ).style.display =
+        "none";
+
+
+    answered = false;
+
+}
+
+
+function checkAnswer(
+    selectedButton,
+    selectedAnswer
+) {
+
+    if (answered) {
+        return;
+    }
+
+
+    answered = true;
+
+
+    const correctAnswer =
+        questions[currentQuestion].answer;
+
+
+    const allOptions =
+        document.querySelectorAll(
+            ".option"
+        );
+
+
+    allOptions.forEach(
+        button => {
+
+            if (
+                button.innerText ===
+                correctAnswer
+            ) {
+
+                button.classList.add(
+                    "correct"
+                );
+
+            }
+
+        }
+    );
+
+
+    if (
+        selectedAnswer ===
+        correctAnswer
+    ) {
+
+        score += 20;
+
+
+        document.getElementById(
+            "score"
+        ).innerText =
+            score;
+
+
+        selectedButton.classList.add(
+            "correct"
+        );
+
+
+        document.getElementById(
+            "message"
+        ).innerText =
+            "🎉 Correct! +20 points";
+
+    } else {
+
+        selectedButton.classList.add(
+            "wrong"
+        );
+
+
+        document.getElementById(
+            "message"
+        ).innerText =
+            "❌ Wrong answer!";
+
+    }
+
+
+    document.getElementById(
+        "nextButton"
+    ).style.display =
+        "block";
+
+}
+
+
+function nextQuestion() {
+
+    currentQuestion++;
+
+
+    if (
+        currentQuestion >=
+        questions.length
+    ) {
+
+        document.getElementById(
+            "question"
+        ).innerText =
+            "🎉 Quiz Complete!";
+
+
+        document.getElementById(
+            "options"
+        ).innerHTML = "";
+
+
+        document.getElementById(
+            "message"
+        ).innerText =
+            "Your final score is " +
+            score +
+            " points.";
+
+
+        document.getElementById(
+            "nextButton"
+        ).style.display =
+            "none";
+
+
+        return;
+
+    }
+
+
+    loadQuestion();
+
+}
+
+
+loadQuestion();
+
+</script>
+
+</body>
+
+</html>

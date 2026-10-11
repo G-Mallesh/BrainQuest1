@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Teacher Videos</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="teacher-container">
+
+    <div class="teacher-header">
+
+        <div>
+
+            <h1>🎬 Video Management</h1>
+
+            <p>
+                Manage educational videos for students.
+            </p>
+
+        </div>
+
+        <a href="{{ url_for('teacher_dashboard') }}">
+            ← Dashboard
+        </a>
+
+    </div>
+
+
+    <section class="teacher-section">
+
+        <!-- Toolbar -->
+        <div class="question-toolbar">
+
+            <a href="{{ url_for('teacher_add_video') }}"
+               class="teacher-primary-button">
+
+                ➕ Add Video
+
+            </a>
+
+        </div>
+
+
+        <!-- Video Cards -->
+        <div class="teacher-content-grid">
+
+            {% for video in videos %}
+
+            <div class="teacher-content-card">
+
+                <div class="teacher-content-icon">
+                    🎬
+                </div>
+
+
+                <h3>
+                    {{ video.title }}
+                </h3>
+
+
+                <p>
+                    <strong>Type:</strong>
+                    {{ video.video_type|capitalize }}
+                </p>
+
+
+                <p>
+                    <strong>Category:</strong>
+                    {{ video.category|capitalize }}
+                </p>
+
+
+                <p>
+                    🎓
+                    {{ video.class_name or "All Classes" }}
+                </p>
+
+
+                {% if video.duration_seconds %}
+
+                <p>
+                    ⏱️
+                    {{ video.duration_seconds }}
+                    seconds
+                </p>
+
+                {% endif %}
+
+
+                {% if video.description %}
+
+                <p>
+                    {{ video.description }}
+                </p>
+
+                {% endif %}
+
+
+                <p>
+                    Status:
+
+                    <span class="content-status">
+                        {{ video.status }}
+                    </span>
+
+                </p>
+
+
+                <!-- ACTION BUTTONS -->
+                <div style="margin-top: 15px;">
+
+                    <a href="{{ url_for(
+                        'teacher_edit_video',
+                        video_id=video.id
+                    ) }}"
+                       class="teacher-primary-button">
+
+                        ✏️ Edit
+
+                    </a>
+
+
+                    <form method="POST"
+                          action="{{ url_for(
+                              'teacher_delete_video',
+                              video_id=video.id
+                          ) }}"
+                          style="display:inline;"
+                          onsubmit="return confirm(
+                              'Delete this video?'
+                          );">
+
+                        <button type="submit"
+                                class="delete-button">
+
+                            🗑️ Delete
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <div class="empty-progress">
+
+                🎬 No videos available.
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+</html>

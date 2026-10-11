@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>BrainQuest Kids</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/dashboard.css'
+        ) }}"
+    >
+
+</head>
+
+<body>
+
+<div class="dashboard-wrapper">
+
+    <!-- NAVBAR -->
+
+    <nav class="student-navbar">
+
+        <div class="brand">
+            🧠 BrainQuest Kids
+        </div>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('dashboard') }}">
+                Home
+            </a>
+
+            <a href="{{ url_for('study') }}">
+                Study
+            </a>
+
+            <a href="#">
+                Games
+            </a>
+            <a href="{{ url_for('profile') }}">
+               👤 Profile
+            </a>
+            <a href="{{ url_for('animals') }}">
+                Animals
+            </a>
+
+            <a href="{{ url_for('logout') }}">
+                Logout
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- WELCOME -->
+
+    <section class="welcome-section">
+
+        <div>
+
+            <p class="small-title">
+                Welcome back 👋
+            </p>
+
+            <h1>
+                Hello, {{ student.full_name }}!
+            </h1>
+
+            <p>
+                {{ student.class_name or 'Student' }}
+                •
+                {{ student.education_level or '' }}
+            </p>
+
+        </div>
+
+        <div class="student-avatar">
+            🧑‍🎓
+        </div>
+
+    </section>
+
+
+    <!-- XP SECTION -->
+
+    <section class="xp-section">
+
+        <div class="xp-header">
+
+            <div>
+
+                <span class="level-label">
+                    LEVEL
+                </span>
+
+                <strong>
+                    {{ xp.current_level }}
+                </strong>
+
+            </div>
+
+            <div class="xp-total">
+
+                ⭐
+                {{ xp.total_xp }} XP
+
+            </div>
+
+        </div>
+
+
+        <div class="xp-progress">
+
+            <div
+                class="xp-progress-fill"
+                style="width: {{ xp_percentage }}%;"
+            ></div>
+
+        </div>
+
+
+        <p class="xp-message">
+
+            {{ current_level_xp }}/100 XP
+
+            •
+            
+            {{ xp_remaining }} XP to next level
+
+        </p>
+
+    </section>
+
+
+    <!-- QUICK STATS -->
+
+    <section class="quick-stats">
+
+        <div class="quick-stat">
+
+            <span>🔥</span>
+
+            <div>
+                <strong>
+                    {{ xp.current_streak }}
+                </strong>
+
+                <small>
+                    Day Streak
+                </small>
+            </div>
+
+        </div>
+
+
+        <div class="quick-stat">
+
+            <span>🏆</span>
+
+            <div>
+                <strong>
+                    {{ badge_count }}
+                </strong>
+
+                <small>
+                    Badges
+                </small>
+            </div>
+
+        </div>
+
+
+        <div class="quick-stat">
+
+            <span>🎮</span>
+
+            <div>
+                <strong>
+                    {{ completed_games }}
+                </strong>
+
+                <small>
+                    Games
+                </small>
+            </div>
+
+        </div>
+
+
+        <div class="quick-stat">
+
+            <span>📝</span>
+
+            <div>
+                <strong>
+                    {{ completed_tasks }}
+                </strong>
+
+                <small>
+                    Tasks
+                </small>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- LEARNING HUB -->
+
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <h2>
+                    📚 Learning Hub
+                </h2>
+
+                <p>
+                    Explore and learn something new.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="feature-grid">
+
+            <a
+                href="{{ url_for('study') }}"
+                class="feature-card study-card"
+            >
+
+                <span>📚</span>
+
+                <h3>
+                    Study Zone
+                </h3>
+
+                <p>
+                    Learn Maths, Science,
+                    English and more.
+                </p>
+
+            </a>
+
+
+            <a
+                href="{{ url_for('games') }}"
+                class="feature-card game-card"
+            >
+
+                <span>🎮</span>
+
+                <h3>
+                    Learning Games
+                </h3>
+
+                <p>
+                    Play games and earn XP.
+                </p>
+
+            </a>
+
+
+            <a
+                href="{{ url_for('animals') }}"
+                class="feature-card animal-card"
+            >
+
+                <span>🦁</span>
+
+                <h3>
+                    Animal World
+                </h3>
+
+                <p>
+                    Discover amazing animals.
+                </p>
+
+            </a>
+
+
+            <a
+                href="{{ url_for('drawing') }}"
+                class="feature-card drawing-card"
+            >
+
+                <span>🎨</span>
+
+                <h3>
+                    Paint & Draw
+                </h3>
+
+                <p>
+                    Create your own artwork.
+                </p>
+
+            </a>
+
+
+            <a
+                href="{{ url_for('stories') }}"
+                class="feature-card story-card"
+            >
+
+                <span>📖</span>
+
+                <h3>
+                    Story World
+                </h3>
+
+                <p>
+                    Read fun educational stories.
+                </p>
+
+            </a>
+
+
+            <a
+                href="{{ url_for('videos') }}"
+                class="feature-card video-card"
+            >
+
+                <span>🎬</span>
+
+                <h3>
+                    Video Zone
+                </h3>
+
+                <p>
+                    Watch educational videos.
+                </p>
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- DAILY TASKS -->
+
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <h2>
+                    📝 Today's Tasks
+                </h2>
+
+                <p>
+                    Complete tasks and earn XP.
+                </p>
+
+            </div>
+
+            <a href="{{ url_for('tasks') }}">
+                View All →
+            </a>
+
+        </div>
+
+
+        <div class="task-dashboard-grid">
+
+        {% for task in daily_tasks %}
+
+            <div class="dashboard-task">
+
+                <div class="task-icon-small">
+                    {% if task.task_type == 'study' %}
+                        📚
+                    {% elif task.task_type == 'game' %}
+                        🎮
+                    {% elif task.task_type == 'drawing' %}
+                        🎨
+                    {% elif task.task_type == 'video' %}
+                        🎬
+                    {% elif task.task_type == 'reading' %}
+                        📖
+                    {% else %}
+                        ⭐
+                    {% endif %}
+                </div>
+
+                <div class="task-info">
+
+                    <h3>
+                        {{ task.title }}
+                    </h3>
+
+                    <p>
+                        +{{ task.points }} XP
+                    </p>
+
+                </div>
+
+                {% if task.status == 'completed' %}
+
+                    <span class="completed-label">
+                        ✓ Done
+                    </span>
+
+                {% else %}
+
+                    <a
+                        href="{{ url_for(
+                            'tasks'
+                        ) }}"
+                        class="small-action"
+                    >
+                        Start
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-dashboard">
+
+                <span>🌟</span>
+
+                <p>
+                    No tasks available today.
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <!-- RECOMMENDED GAMES -->
+
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <h2>
+                    🎮 Recommended Games
+                </h2>
+
+                <p>
+                    Games selected for your class.
+                </p>
+
+            </div>
+
+            <a href="{{ url_for('games') }}">
+                View All →
+            </a>
+
+        </div>
+
+
+        <div class="recommendation-grid">
+
+        {% for game in recommended_games %}
+
+            <div class="recommendation-card">
+
+                <div class="recommendation-icon">
+                    🎮
+                </div>
+
+                <h3>
+                    {{ game.title }}
+                </h3>
+
+                <p>
+                    {{ game.description or
+                    'Fun learning game' }}
+                </p>
+
+                <span>
+                    ⭐ {{ game.points }} points
+                </span>
+
+            </div>
+
+        {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <!-- RECOMMENDED STORIES -->
+
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <h2>
+                    📖 Recommended Stories
+                </h2>
+
+                <p>
+                    Stories for your learning level.
+                </p>
+
+            </div>
+
+            <a href="{{ url_for('stories') }}">
+                View All →
+            </a>
+
+        </div>
+
+
+        <div class="recommendation-grid">
+
+        {% for story in recommended_stories %}
+
+            <a
+                href="{{ url_for(
+                    'read_story',
+                    story_id=story.id
+                ) }}"
+                class="recommendation-card"
+            >
+
+                <div class="recommendation-icon">
+                    📖
+                </div>
+
+                <h3>
+                    {{ story.title }}
+                </h3>
+
+                <p>
+                    {{ story.description or
+                    'Interesting story' }}
+                </p>
+
+                <span>
+                    ⏱️
+                    {{ story.reading_time or 5 }}
+                    min
+                </span>
+
+            </a>
+
+        {% endfor %}
+
+        </div>
+
+    </section>
+<a
+    href="{{ url_for('leaderboard') }}"
+    class="feature-card"
+>
+
+    <span>🏆</span>
+
+    <h3>
+        Leaderboard
+    </h3>
+
+    <p>
+        See your class XP ranking.
+    </p>
+
+</a>
+<a
+    href="{{ url_for('quiz') }}"
+    class="feature-card"
+>
+
+    <span>🧠</span>
+
+    <h3>
+        Brain Quiz
+    </h3>
+
+    <p>
+        Answer questions and earn XP.
+    </p>
+
+</a>
+    <!-- BADGES -->
+
+    <section class="dashboard-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <h2>
+                    🏆 Your Badges
+                </h2>
+
+                <p>
+                    Keep learning to unlock more badges.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="badge-grid">
+
+        {% for badge in badges %}
+
+            <div class="badge-card">
+
+                <div class="badge-icon">
+                    🏆
+                </div>
+
+                <h3>
+                    {{ badge.badge_name }}
+                </h3>
+
+                <p>
+                    {{ badge.description }}
+                </p>
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-dashboard">
+
+                <span>🏆</span>
+
+                <p>
+                    Complete activities to earn
+                    your first badge!
+                </p>
+
+            </div>
+
+        {% endfor %}
+
+        </div>
+
+    </section>
+
+
+    <!-- ACTIVITY SUMMARY -->
+
+    <section class="dashboard-section">
+
+        <h2>
+            📈 Learning Activity
+        </h2>
+
+        <div class="activity-grid">
+
+            <div>
+                <strong>
+                    {{ completed_games }}
+                </strong>
+
+                <span>
+                    Games Completed
+                </span>
+            </div>
+
+            <div>
+                <strong>
+                    {{ completed_stories }}
+                </strong>
+
+                <span>
+                    Stories Read
+                </span>
+            </div>
+
+            <div>
+                <strong>
+                    {{ completed_videos }}
+                </strong>
+
+                <span>
+                    Videos Watched
+                </span>
+            </div>
+
+            <div>
+                <strong>
+                    {{ completed_tasks }}
+                </strong>
+
+                <span>
+                    Tasks Completed
+                </span>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <footer class="student-footer">
+
+        <p>
+            🧠 BrainQuest Kids
+        </p>
+
+        <p>
+            Learn • Play • Create • Grow
+        </p>
+
+    </footer>
+
+</div>
+
+</body>
+</html>

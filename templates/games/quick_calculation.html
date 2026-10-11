@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Quick Calculation | BrainQuest</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #ff9966, #ff5e62);
+            color: #222;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 25px;
+        }
+
+        .game-box {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        }
+
+        h1 {
+            text-align: center;
+            color: #e11d48;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            padding: 12px 20px;
+            border-radius: 12px;
+            background: #fff7ed;
+            font-weight: bold;
+        }
+
+        .score {
+            color: #16a34a;
+        }
+
+        .question-number {
+            color: #2563eb;
+        }
+
+        .timer {
+            color: #dc2626;
+        }
+
+        .game-area {
+            text-align: center;
+        }
+
+        .question-card {
+            background: #fff7ed;
+            border-radius: 20px;
+            padding: 35px 20px;
+            margin-bottom: 25px;
+        }
+
+        .question-label {
+            font-size: 18px;
+            color: #203fc9;
+            margin-bottom: 15px;
+        }
+
+        .question {
+            font-size: 55px;
+            font-weight: bold;
+            color: #c2410c;
+            margin: 15px;
+        }
+
+        .answer-area {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        #answer {
+            width: 250px;
+            padding: 15px;
+            font-size: 22px;
+            text-align: center;
+            border: 3px solid #fdba74;
+            border-radius: 12px;
+            outline: none;
+        }
+
+        #answer:focus {
+            border-color: #f97316;
+        }
+
+        .submit-btn {
+            border: none;
+            padding: 15px 25px;
+            background: #f97316;
+            color: white;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #ea580c;
+        }
+
+        .message {
+            min-height: 35px;
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .next-btn,
+        .restart-btn {
+            border: none;
+            padding: 13px 24px;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        .next-btn {
+            background: #2563eb;
+        }
+
+        .restart-btn {
+            background: #16a34a;
+        }
+
+        .next-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .restart-btn:hover {
+            background: #15803d;
+        }
+
+        .result {
+            display: none;
+            text-align: center;
+            padding: 35px;
+            background: #f0fdf4;
+            border-radius: 20px;
+        }
+
+        .result h2 {
+            color: #15803d;
+            font-size: 32px;
+        }
+
+        .final-score {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 20px;
+        }
+
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 15px;
+        }
+
+        .instructions h3 {
+            color: #c2410c;
+        }
+
+        .instructions li {
+            margin: 8px 0;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            background: #111827;
+            color: white;
+            padding: 13px 22px;
+            border-radius: 12px;
+        }
+
+        @media (max-width: 600px) {
+
+            .game-box {
+                padding: 18px;
+            }
+
+            .question {
+                font-size: 38px;
+            }
+
+            #answer {
+                width: 100%;
+            }
+
+            .submit-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="game-box">
+
+        <h1>🧮 Quick Calculation</h1>
+
+        <p class="subtitle">
+            Solve the calculation as quickly as possible!
+        </p>
+
+
+        <div class="stats">
+
+            <div class="stat question-number">
+                📝 Question:
+                <span id="questionNumber">1</span>/10
+            </div>
+
+            <div class="stat score">
+                ⭐ Score:
+                <span id="score">0</span>
+            </div>
+
+            <div class="stat timer">
+                ⏱️ Time:
+                <span id="timer">30</span>s
+            </div>
+
+        </div>
+
+
+        <!-- GAME -->
+
+        <div id="gameArea" class="game-area">
+
+            <div class="question-card">
+
+                <div class="question-label">
+                    Calculate:
+                </div>
+
+                <div id="question" class="question">
+                    5 + 3 = ?
+                </div>
+
+            </div>
+
+
+            <div class="answer-area">
+
+                <input
+                    type="number"
+                    id="answer"
+                    placeholder="Enter answer"
+                    autocomplete="off"
+                >
+
+                <button
+                    class="submit-btn"
+                    onclick="checkAnswer()"
+                >
+                    ✅ Submit
+                </button>
+
+            </div>
+
+
+            <div id="message" class="message"></div>
+
+
+            <button
+                id="nextButton"
+                class="next-btn"
+                onclick="nextQuestion()"
+                style="display:none;"
+            >
+                Next Question ➡️
+            </button>
+
+        </div>
+
+
+        <!-- RESULT -->
+
+        <div id="result" class="result">
+
+            <h2>🎉 Game Completed!</h2>
+
+            <div class="final-score">
+                ⭐ Final Score:
+                <span id="finalScore">0</span>
+            </div>
+
+            <p>
+                Great work! Keep practicing your calculations. 🧠
+            </p>
+
+            <button
+                class="restart-btn"
+                onclick="startGame()"
+            >
+                🔄 Play Again
+            </button>
+
+        </div>
+
+
+        <!-- INSTRUCTIONS -->
+
+        <div class="instructions">
+
+            <h3>🎮 How to Play</h3>
+
+            <ul>
+                <li>Solve each mathematical calculation.</li>
+                <li>Enter your answer in the box.</li>
+                <li>Press <strong>Submit</strong>.</li>
+                <li>Each correct answer gives <strong>10 points</strong>.</li>
+                <li>You have 30 seconds for each question.</li>
+                <li>There are 10 questions.</li>
+            </ul>
+
+        </div>
+
+
+        <div style="text-align:center;">
+
+            <a
+                href="{{ url_for('games') }}"
+                class="back"
+            >
+                ⬅️ Back to Games
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const questions = [
+
+    {
+        question: "5 + 3 = ?",
+        answer: 8
+    },
+
+    {
+        question: "10 - 4 = ?",
+        answer: 6
+    },
+
+    {
+        question: "6 × 3 = ?",
+        answer: 18
+    },
+
+    {
+        question: "20 ÷ 4 = ?",
+        answer: 5
+    },
+
+    {
+        question: "15 + 7 = ?",
+        answer: 22
+    },
+
+    {
+        question: "30 - 12 = ?",
+        answer: 18
+    },
+
+    {
+        question: "7 × 4 = ?",
+        answer: 28
+    },
+
+    {
+        question: "36 ÷ 6 = ?",
+        answer: 6
+    },
+
+    {
+        question: "25 + 16 = ?",
+        answer: 41
+    },
+
+    {
+        question: "50 - 27 = ?",
+        answer: 23
+    }
+
+];
+
+
+let currentQuestion = 0;
+let score = 0;
+let answered = false;
+let timer;
+let timeLeft = 30;
+
+
+function startGame() {
+
+    currentQuestion = 0;
+    score = 0;
+    answered = false;
+
+    clearInterval(timer);
+
+    document.getElementById("score").textContent = score;
+
+    document.getElementById("gameArea").style.display = "block";
+
+    document.getElementById("result").style.display = "none";
+
+    loadQuestion();
+}
+
+
+function loadQuestion() {
+
+    clearInterval(timer);
+
+    answered = false;
+
+    timeLeft = 30;
+
+    const q = questions[currentQuestion];
+
+    document.getElementById("questionNumber").textContent =
+        currentQuestion + 1;
+
+    document.getElementById("question").textContent =
+        q.question;
+
+    document.getElementById("timer").textContent =
+        timeLeft;
+
+    document.getElementById("answer").value = "";
+
+    document.getElementById("answer").disabled = false;
+
+    document.getElementById("message").textContent = "";
+
+    document.getElementById("nextButton").style.display =
+        "none";
+
+
+    document.getElementById("answer").focus();
+
+
+    timer = setInterval(function() {
+
+        timeLeft--;
+
+        document.getElementById("timer").textContent =
+            timeLeft;
+
+        if (timeLeft <= 0) {
+
+            clearInterval(timer);
+
+            timeUp();
+
+        }
+
+    }, 1000);
+
+}
+
+
+function checkAnswer() {
+
+    if (answered) {
+        return;
+    }
+
+    const input =
+        document.getElementById("answer");
+
+    const userAnswer =
+        Number(input.value);
+
+    if (input.value.trim() === "") {
+
+        document.getElementById("message").textContent =
+            "⚠️ Please enter an answer.";
+
+        return;
+    }
+
+    answered = true;
+
+    clearInterval(timer);
+
+    input.disabled = true;
+
+    const correctAnswer =
+        questions[currentQuestion].answer;
+
+
+    if (userAnswer === correctAnswer) {
+
+        score += 10;
+
+        document.getElementById("score").textContent =
+            score;
+
+        document.getElementById("message").textContent =
+            "🎉 Correct! +10 points";
+
+    } else {
+
+        document.getElementById("message").textContent =
+            "❌ Wrong! Correct answer is " +
+            correctAnswer;
+
+    }
+
+
+    showNextButton();
+
+}
+
+
+function timeUp() {
+
+    if (answered) {
+        return;
+    }
+
+    answered = true;
+
+    document.getElementById("answer").disabled = true;
+
+    const correctAnswer =
+        questions[currentQuestion].answer;
+
+    document.getElementById("message").textContent =
+        "⏰ Time's up! Correct answer is " +
+        correctAnswer;
+
+    showNextButton();
+
+}
+
+
+function showNextButton() {
+
+    if (currentQuestion <
+        questions.length - 1) {
+
+        document.getElementById("nextButton").style.display =
+            "inline-block";
+
+    } else {
+
+        setTimeout(showResult, 800);
+
+    }
+
+}
+
+
+function nextQuestion() {
+
+    if (currentQuestion <
+        questions.length - 1) {
+
+        currentQuestion++;
+
+        loadQuestion();
+
+    }
+
+}
+
+
+function showResult() {
+
+    clearInterval(timer);
+
+    document.getElementById("gameArea").style.display =
+        "none";
+
+    document.getElementById("result").style.display =
+        "block";
+
+    document.getElementById("finalScore").textContent =
+        score;
+
+}
+
+
+document.getElementById("answer").addEventListener(
+    "keydown",
+    function(event) {
+
+        if (event.key === "Enter") {
+
+            checkAnswer();
+
+        }
+
+    }
+);
+
+
+startGame();
+
+</script>
+
+</body>
+</html>

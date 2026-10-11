@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Weekly Report</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns:
+                repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat {
+            background: white;
+            padding: 25px;
+            text-align: center;
+            border-radius: 18px;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 30px;
+            margin: 10px;
+        }
+
+        .chart {
+            margin-top: 25px;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+        }
+
+        .day {
+            margin: 18px 0;
+        }
+
+        .bar {
+            height: 20px;
+            background: #e5e7eb;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .fill {
+            height: 100%;
+            background: #7c3aed;
+        }
+
+        @media(max-width:700px) {
+
+            .stats {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>
+            📊 Weekly Learning Report
+        </h1>
+
+        <p>
+            Student:
+            <strong>
+                {{ child.full_name }}
+            </strong>
+        </p>
+
+        <p>
+            Child Code:
+            <strong>
+                {{ child.child_code }}
+            </strong>
+        </p>
+
+    </div>
+
+
+    <div class="stats">
+
+        <div class="stat">
+
+            🎮
+
+            <strong>
+                {{ weekly_games | sum(attribute='games_played') }}
+            </strong>
+
+            Games
+
+        </div>
+
+
+        <div class="stat">
+
+            📝
+
+            <strong>
+                {{ weekly_tasks }}
+            </strong>
+
+            Tasks
+
+        </div>
+
+
+        <div class="stat">
+
+            📖
+
+            <strong>
+                {{ weekly_stories }}
+            </strong>
+
+            Stories
+
+        </div>
+
+
+        <div class="stat">
+
+            🎬
+
+            <strong>
+                {{ weekly_videos }}
+            </strong>
+
+            Videos
+
+        </div>
+
+    </div>
+
+
+    <div class="chart">
+
+        <h2>
+            📅 Daily Game Activity
+        </h2>
+
+        {% set max_games = 1 %}
+
+        {% for item in weekly_games %}
+
+            {% if item.games_played > max_games %}
+
+                {% set max_games =
+                    item.games_played
+                %}
+
+            {% endif %}
+
+        {% endfor %}
+
+
+        {% for item in weekly_games %}
+
+        <div class="day">
+
+            <strong>
+                {{ item.activity_date }}
+            </strong>
+
+            <span>
+                {{ item.games_played }}
+                games
+            </span>
+
+            <div class="bar">
+
+                <div
+                    class="fill"
+                    style="
+                        width:
+                        {{
+                            (
+                                item.games_played
+                                / max_games
+                                * 100
+                            ) | round | int
+                        }}%;
+                    "
+                ></div>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <p>
+            No game activity during this week.
+        </p>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</body>
+</html>

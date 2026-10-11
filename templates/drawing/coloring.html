@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Coloring</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="drawing-container">
+
+    <div class="drawing-header">
+
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+        <h1>🌈 Coloring Zone</h1>
+
+        <a href="{{ url_for('drawing') }}">
+            🎨 Free Draw
+        </a>
+
+    </div>
+
+
+    <div class="drawing-intro">
+
+        <h2>🌈 Create Your Coloring Artwork</h2>
+
+        <p>
+            Choose a color and draw on the canvas.
+        </p>
+
+    </div>
+
+
+    <div class="canvas-wrapper">
+
+        <canvas
+            id="colorCanvas"
+            width="1000"
+            height="600">
+        </canvas>
+
+    </div>
+
+
+    <div class="drawing-toolbar">
+
+        <label>
+
+            Choose Color:
+
+            <input
+                type="color"
+                id="color"
+                value="#ff0000"
+            >
+
+        </label>
+
+
+        <label>
+
+            Brush:
+
+            <input
+                type="range"
+                id="size"
+                min="5"
+                max="60"
+                value="20"
+            >
+
+        </label>
+
+
+        <button
+            onclick="clearColorCanvas()">
+            🗑️ Clear
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const canvas =
+    document.getElementById(
+        "colorCanvas"
+    );
+
+const ctx =
+    canvas.getContext("2d");
+
+
+let drawing = false;
+
+
+ctx.fillStyle = "white";
+
+ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+);
+
+
+function position(event) {
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+
+    return {
+
+        x:
+            (event.clientX - rect.left)
+            *
+            canvas.width /
+            rect.width,
+
+        y:
+            (event.clientY - rect.top)
+            *
+            canvas.height /
+            rect.height
+
+    };
+
+}
+
+
+canvas.addEventListener(
+    "mousedown",
+    function(event) {
+
+        drawing = true;
+
+        const p =
+            position(event);
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            p.x,
+            p.y
+        );
+
+    }
+);
+
+
+canvas.addEventListener(
+    "mousemove",
+    function(event) {
+
+        if (!drawing) {
+            return;
+        }
+
+
+        const p =
+            position(event);
+
+
+        ctx.lineWidth =
+            document.getElementById(
+                "size"
+            ).value;
+
+
+        ctx.lineCap = "round";
+
+
+        ctx.strokeStyle =
+            document.getElementById(
+                "color"
+            ).value;
+
+
+        ctx.lineTo(
+            p.x,
+            p.y
+        );
+
+        ctx.stroke();
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            p.x,
+            p.y
+        );
+
+    }
+);
+
+
+canvas.addEventListener(
+    "mouseup",
+    function() {
+
+        drawing = false;
+
+    }
+);
+
+
+canvas.addEventListener(
+    "mouseleave",
+    function() {
+
+        drawing = false;
+
+    }
+);
+
+
+function clearColorCanvas() {
+
+    ctx.fillStyle = "white";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+}
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Teacher Tasks</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="teacher-container">
+
+    <div class="teacher-header">
+
+        <div>
+            <h1>📝 Task Management</h1>
+
+            <p>
+                Create and manage learning tasks for students.
+            </p>
+        </div>
+
+        <a href="{{ url_for('teacher_dashboard') }}">
+            ← Dashboard
+        </a>
+
+    </div>
+
+
+    <section class="teacher-section">
+
+        <!-- Toolbar -->
+        <div class="question-toolbar">
+
+            <a href="{{ url_for('teacher_add_task') }}"
+               class="teacher-primary-button">
+                ➕ Add Task
+            </a>
+
+        </div>
+
+
+        <!-- Task Cards -->
+        <div class="teacher-content-grid">
+
+            {% for task in tasks %}
+
+            <div class="teacher-content-card">
+
+                <div class="teacher-content-icon">
+                    📝
+                </div>
+
+                <h3>
+                    {{ task.title }}
+                </h3>
+
+                <p>
+                    {{ task.description }}
+                </p>
+
+                <p>
+                    <strong>Type:</strong>
+                    {{ task.task_type }}
+                </p>
+
+                <p>
+                    ⭐
+                    <strong>{{ task.points }}</strong>
+                    XP
+                </p>
+
+                <p>
+                    🎓
+                    {{ task.class_name or "All Classes" }}
+                </p>
+
+                {% if task.due_date %}
+
+                <p>
+                    📅
+                    {{ task.due_date }}
+                </p>
+
+                {% endif %}
+
+                <p>
+                    Status:
+                    <span class="content-status">
+                        {{ task.status }}
+                    </span>
+                </p>
+
+
+                <!-- ACTION BUTTONS -->
+                <div style="margin-top: 15px;">
+
+                    <a href="{{ url_for(
+                        'teacher_edit_task',
+                        task_id=task.id
+                    ) }}"
+                       class="teacher-primary-button">
+
+                        ✏️ Edit
+
+                    </a>
+
+
+                    <form method="POST"
+                          action="{{ url_for(
+                              'teacher_delete_task',
+                              task_id=task.id
+                          ) }}"
+                          style="display:inline;"
+                          onsubmit="return confirm(
+                              'Delete this task?'
+                          );">
+
+                        <button type="submit"
+                                class="delete-button">
+
+                            🗑️ Delete
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            {% else %}
+
+            <div class="empty-progress">
+
+                📝 No tasks available.
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+</html>

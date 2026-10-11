@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>{{ animal.name }}</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="animal-detail-container">
+
+    <a href="{{ url_for('animals') }}">
+        ← Back to Animal World
+    </a>
+
+
+    <div class="animal-detail-card">
+
+        {% if animal.image_path %}
+
+        <img
+            src="{{ url_for(
+                'static',
+                filename=animal.image_path
+            ) }}"
+            alt="{{ animal.name }}"
+            class="animal-detail-image"
+        >
+
+        {% else %}
+
+        <div class="animal-detail-placeholder">
+            🐾
+        </div>
+
+        {% endif %}
+
+
+        <h1>
+            {{ animal.name }}
+        </h1>
+
+
+        <h3>
+            Category:
+            {{ animal.category | title }}
+        </h3>
+
+
+        {% if animal.scientific_name %}
+
+        <p>
+            <strong>
+                🔬 Scientific Name:
+            </strong>
+
+            {{ animal.scientific_name }}
+        </p>
+
+        {% endif %}
+
+
+        <p>
+            <strong>
+                📖 Description:
+            </strong>
+        </p>
+
+        <p>
+            {{ animal.description }}
+        </p>
+
+
+        <p>
+            <strong>
+                🌎 Habitat:
+            </strong>
+
+            {{ animal.habitat }}
+        </p>
+
+
+        <p>
+            <strong>
+                🍎 Food:
+            </strong>
+
+            {{ animal.food }}
+        </p>
+
+
+        {% if animal.sound_name %}
+
+        <p>
+            <strong>
+                🔊 Sound:
+            </strong>
+
+            {{ animal.sound_name }}
+        </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

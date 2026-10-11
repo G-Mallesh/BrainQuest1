@@ -1,0 +1,104 @@
+<h1>👨‍🏫 Teachers</h1>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<a href="{{ url_for('admin_dashboard') }}">
+    ← Admin Dashboard
+</a>
+<form method="GET"
+      action="{{ url_for('admin_teachers') }}">
+
+    <input
+        type="text"
+        name="search"
+        placeholder="Search teacher..."
+        value="{{ search }}"
+    >
+
+    <button type="submit">
+        🔎 Search
+    </button>
+
+</form>
+
+<br>
+<br><br>
+
+<table class="student-table">
+
+    <thead>
+
+        <tr>
+            <th>Action</th>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>City</th>
+            <th>Status</th>
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for teacher in teachers %}
+
+        <tr>
+
+            <td>{{ teacher.id }}</td>
+            <td>{{ teacher.full_name }}</td>
+            <td>{{ teacher.email }}</td>
+            <td>{{ teacher.phone or '-' }}</td>
+            <td>{{ teacher.city or '-' }}</td>
+            <td>{{ teacher.status }}</td>
+             <td>
+
+<form
+    method="POST"
+    action="{{ url_for(
+        'admin_teacher_status',
+        teacher_id=teacher.id
+    ) }}"
+>
+
+{% if teacher.status == 'active' %}
+
+    <input
+        type="hidden"
+        name="status"
+        value="inactive"
+    >
+
+    <button
+        type="submit"
+        class="delete-button"
+    >
+        🔴 Deactivate
+    </button>
+
+{% else %}
+
+    <input
+        type="hidden"
+        name="status"
+        value="active"
+    >
+
+    <button
+        type="submit"
+        class="teacher-primary-button"
+    >
+        🟢 Activate
+    </button>
+
+{% endif %}
+
+</form>
+
+</td>
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>

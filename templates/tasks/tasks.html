@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Daily Tasks - BrainQuest Kids
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="tasks-container">
+
+
+    <!-- Header -->
+
+    <div class="tasks-header">
+
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+        <h1>
+            📝 Daily Tasks
+        </h1>
+
+        <span>
+            {{ class_name }}
+        </span>
+
+    </div>
+
+
+    <!-- Introduction -->
+
+    <div class="tasks-intro">
+
+        <h2>
+            🌟 Today's Learning Challenges
+        </h2>
+
+        <p>
+            Complete your tasks and
+            earn XP and points!
+        </p>
+
+    </div>
+
+
+    <!-- Task Grid -->
+
+    <div class="tasks-grid">
+
+        {% for task in tasks %}
+
+        <div
+            class="task-card
+            {% if task.student_status == 'completed' %}
+                task-completed
+            {% endif %}"
+            id="task-{{ task.id }}"
+        >
+
+
+            <!-- Icon -->
+
+            <div class="task-icon">
+
+                {% if task.task_type == 'study' %}
+                    📚
+
+                {% elif task.task_type == 'game' %}
+                    🎮
+
+                {% elif task.task_type == 'reading' %}
+                    📖
+
+                {% elif task.task_type == 'drawing' %}
+                    🎨
+
+                {% elif task.task_type == 'quiz' %}
+                    ❓
+
+                {% elif task.task_type == 'video' %}
+                    🎬
+
+                {% elif task.task_type == 'memory' %}
+                    🧠
+
+                {% elif task.task_type == 'creative' %}
+                    ✨
+
+                {% else %}
+                    📝
+                {% endif %}
+
+            </div>
+
+
+            <!-- Content -->
+
+            <div class="task-content">
+
+                <h2>
+                    {{ task.title }}
+                </h2>
+
+                <p>
+                    {{ task.description }}
+                </p>
+
+
+                <div class="task-meta">
+
+                    <span>
+                        🏷️
+                        {{ task.task_type|capitalize }}
+                    </span>
+
+                    <span>
+                        ⭐
+                        {{ task.points or 10 }}
+                        XP
+                    </span>
+
+                </div>
+
+
+                {% if task.due_date %}
+
+                <p class="task-due">
+
+                    📅 Due:
+                    {{ task.due_date }}
+
+                </p>
+
+                {% endif %}
+
+
+                {% if task.student_status == 'completed' %}
+
+                    <div class="task-done">
+
+                        ✅ Completed
+
+                        {% if task.score is not none %}
+
+                            <br>
+
+                            Score:
+                            {{ task.score }}
+
+                        {% endif %}
+
+                    </div>
+
+                {% else %}
+
+                    <button
+                        class="task-button"
+                        onclick="completeTask(
+                            {{ task.id }},
+                            {{ task.points or 10 }}
+                        )"
+                    >
+                        ✅ Complete Task
+                    </button>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+        <div class="no-tasks">
+
+            <h2>
+                🎉 No tasks available
+            </h2>
+
+            <p>
+                New learning tasks will
+                appear here soon.
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+<script>
+
+function completeTask(
+    taskId,
+    points
+) {
+
+    const button =
+        document.querySelector(
+            "#task-" +
+            taskId +
+            " .task-button"
+        );
+
+    if (button) {
+
+        button.disabled = true;
+
+        button.innerText =
+            "Saving...";
+
+    }
+
+
+    fetch(
+        "/tasks/" +
+        taskId +
+        "/complete",
+        {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+
+            body: JSON.stringify({
+
+                score: points
+
+            })
+
+        }
+    )
+
+    .then(response =>
+        response.json()
+    )
+
+    .then(data => {
+
+        if (data.success) {
+
+            if (data.already_completed) {
+
+                alert(
+                    "This task is already completed."
+                );
+
+                return;
+
+            }
+
+
+            alert(
+                "🎉 Task completed! +" +
+                data.xp_added +
+                " XP"
+            );
+
+
+            const card =
+                document.getElementById(
+                    "task-" + taskId
+                );
+
+            card.classList.add(
+                "task-completed"
+            );
+
+
+            const buttonArea =
+                card.querySelector(
+                    ".task-button"
+                );
+
+            if (buttonArea) {
+
+                buttonArea.outerHTML =
+                    '<div class="task-done">' +
+                    '✅ Completed' +
+                    '</div>';
+
+            }
+
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            "Task error:",
+            error
+        );
+
+        alert(
+            "Unable to complete task."
+        );
+
+        if (button) {
+
+            button.disabled = false;
+
+            button.innerText =
+                "✅ Complete Task";
+
+        }
+
+    });
+
+}
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Students | BrainQuest Teacher</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 25px;
+        }
+
+        header .top {
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        .back-btn {
+            background: white;
+            color: #4f46e5;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .title-box {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .title-box h2 {
+            margin-top: 0;
+            color: #4f46e5;
+        }
+
+        .table-box {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            overflow-x: auto;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        th {
+            background: #4f46e5;
+            color: white;
+            padding: 14px;
+            text-align: left;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f8f8ff;
+        }
+
+        .status {
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+        @media (max-width: 700px) {
+
+            header .top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .container {
+                padding: 0 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="top">
+
+        <div>
+            <h1>👨‍🎓 Student Management</h1>
+            <p>BrainQuest Teacher Panel</p>
+        </div>
+
+        <a
+            href="{{ url_for('teacher_dashboard') }}"
+            class="back-btn"
+        >
+            ← Teacher Dashboard
+        </a>
+
+    </div>
+</header>
+
+<div class="container">
+
+    <div class="title-box">
+
+        <h2>📚 All Students</h2>
+
+        <p>
+            View student information, class, XP, level and learning streak.
+        </p>
+
+    </div>
+
+    <div class="table-box">
+
+        {% if students %}
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>City</th>
+                    <th>Class</th>
+                    <th>XP</th>
+                    <th>Action</th>
+                    <th>Level</th>
+                    <th>Streak</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for student in students %}
+
+                <tr>
+                    <a
+    href="{{ url_for(
+        'teacher_student_progress',
+        student_id=student.id
+    ) }}"
+    class="teacher-primary-button"
+>
+    📊 View Progress
+</a>
+<form method="GET"
+      action="{{ url_for('admin_students') }}">
+
+    <input
+        type="text"
+        name="search"
+        placeholder="Search student..."
+        value="{{ search }}"
+    >
+
+    <button type="submit">
+        🔎 Search
+    </button>
+
+</form>
+
+<br>
+                    <td>
+                        {{ student.id }}
+                    </td>
+
+                    <td>
+                        <strong>
+                            {{ student.full_name }}
+                        </strong>
+                    </td>
+
+                    <td>
+                        {{ student.email }}
+                    </td>
+
+                    <td>
+                        {{ student.phone or "-" }}
+                    </td>
+
+                    <td>
+                        {{ student.city or "-" }}
+                    </td>
+
+                    <td>
+                        {{ student.class_name or "-" }}
+                    </td>
+
+                    <td>
+                        ⭐ {{ student.total_xp or 0 }}
+                    </td>
+
+                    <td>
+                        🏆 {{ student.current_level or 1 }}
+                    </td>
+
+                    <td>
+                        🔥 {{ student.current_streak or 0 }}
+                    </td>
+                    <td>
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'admin_student_status',
+            student_id=student.id
+        ) }}"
+    >
+
+        {% if student.status == 'active' %}
+
+            <input
+                type="hidden"
+                name="status"
+                value="inactive"
+            >
+
+            <button type="submit"
+                    class="delete-button">
+                🔴 Deactivate
+            </button>
+
+        {% else %}
+
+            <input
+                type="hidden"
+                name="status"
+                value="active"
+            >
+
+            <button type="submit"
+                    class="teacher-primary-button">
+                🟢 Activate
+            </button>
+
+        {% endif %}
+
+    </form>
+
+</td> 
+                    <td>
+
+                        {% if student.status == "active" %}
+
+                            <span class="status active">
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="status inactive">
+                                {{ student.status or "Inactive" }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+                  
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+        <div class="empty">
+
+            <h2>👨‍🎓 No Students Found</h2>
+
+            <p>
+                There are currently no student accounts.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<footer>
+    © 2026 BrainQuest Kids — Teacher Panel
+</footer>
+
+</body>
+</html>

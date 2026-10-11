@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Calculation Game</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="game-container">
+
+    <div class="game-header">
+
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+        <h1>🧮 Quick Calculation</h1>
+
+        <div>
+            ⏱️ <span id="timer">60</span>s
+        </div>
+
+    </div>
+
+
+    <div class="game-info">
+
+        <p>
+            👦 Class: <strong>{{ class_name }}</strong>
+        </p>
+
+        <p>
+            Question:
+            <strong>
+                <span id="questionNumber">1</span>
+                / 10
+            </strong>
+        </p>
+
+        <p>
+            ⭐ Score:
+            <strong>
+                <span id="score">0</span>
+            </strong>
+        </p>
+
+    </div>
+
+
+    <div class="question-card">
+
+        <div id="question"
+             class="question">
+            Loading...
+        </div>
+
+
+        <input
+            type="number"
+            id="answer"
+            placeholder="Enter your answer"
+            autocomplete="off"
+        >
+
+
+        <button
+            id="submitBtn"
+            onclick="submitAnswer()">
+            ✅ Submit Answer
+        </button>
+
+
+        <p id="message"></p>
+
+    </div>
+
+
+    <div id="result"
+         class="result-card"
+         style="display:none;">
+
+        <h2>🎉 Game Complete!</h2>
+
+        <p>
+            Your Score:
+            <strong id="finalScore"></strong>
+        </p>
+
+        <p>
+            Correct:
+            <strong id="finalCorrect"></strong>
+        </p>
+
+        <p>
+            Wrong:
+            <strong id="finalWrong"></strong>
+        </p>
+
+        <p>
+            ⭐ XP Earned:
+            <strong id="finalXP"></strong>
+        </p>
+
+        <button onclick="location.reload()">
+            🔄 Play Again
+        </button>
+
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let questions = {{ questions | tojson }};
+
+let currentQuestion = 0;
+
+let score = 0;
+
+let correct = 0;
+
+let wrong = 0;
+
+let timeLeft = 60;
+
+let timer;
+
+
+const questionElement =
+    document.getElementById("question");
+
+const answerElement =
+    document.getElementById("answer");
+
+const scoreElement =
+    document.getElementById("score");
+
+const questionNumberElement =
+    document.getElementById("questionNumber");
+
+const timerElement =
+    document.getElementById("timer");
+
+const messageElement =
+    document.getElementById("message");
+
+
+function showQuestion() {
+
+    if (currentQuestion >= questions.length) {
+
+        finishGame();
+
+        return;
+    }
+
+
+    const question =
+        questions[currentQuestion];
+
+
+    questionElement.textContent =
+        question.question;
+
+
+    questionNumberElement.textContent =
+        currentQuestion + 1;
+
+
+    answerElement.value = "";
+
+    answerElement.focus();
+
+}
+
+
+function submitAnswer() {
+
+    if (currentQuestion >= questions.length) {
+        return;
+    }
+
+
+    const userAnswer =
+        Number(answerElement.value);
+
+
+    if (
+        answerElement.value.trim() === ""
+    ) {
+
+        messageElement.textContent =
+            "⚠️ Enter an answer.";
+
+        return;
+    }
+
+
+    const question =
+        questions[currentQuestion];
+
+
+    if (userAnswer === question.answer) {
+
+        correct++;
+
+        score += 10;
+
+        messageElement.textContent =
+            "✅ Correct! +10 points";
+
+    } else {
+
+        wrong++;
+
+        messageElement.textContent =
+            "❌ Wrong!";
+
+    }
+
+
+    scoreElement.textContent =
+        score;
+
+
+    currentQuestion++;
+
+
+    setTimeout(function () {
+
+        messageElement.textContent = "";
+
+        showQuestion();
+
+    }, 600);
+
+}
+
+
+function startTimer() {
+
+    timer = setInterval(function () {
+
+        timeLeft--;
+
+        timerElement.textContent =
+            timeLeft;
+
+
+        if (timeLeft <= 0) {
+
+            clearInterval(timer);
+
+            finishGame();
+
+        }
+
+    }, 1000);
+
+}
+
+
+function finishGame() {
+
+    clearInterval(timer);
+
+
+    questionElement.parentElement.style.display =
+        "none";
+
+
+    document.querySelector(".game-info")
+        .style.display = "none";
+
+
+    document.getElementById("result")
+        .style.display = "block";
+
+
+    document.getElementById("finalScore")
+        .textContent = score;
+
+
+    document.getElementById("finalCorrect")
+        .textContent = correct;
+
+
+    document.getElementById("finalWrong")
+        .textContent = wrong;
+
+
+    const xp = score;
+
+    document.getElementById("finalXP")
+        .textContent = xp;
+
+
+    saveScore(
+        score,
+        correct,
+        wrong
+    );
+
+}
+
+
+function saveScore(
+    score,
+    correct,
+    wrong
+) {
+
+    fetch(
+        "{{ url_for('save_calculation_score') }}",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+
+            body: JSON.stringify({
+
+                score: score,
+
+                correct_answers:
+                    correct,
+
+                wrong_answers:
+                    wrong
+
+            })
+        }
+    )
+
+    .then(response =>
+        response.json()
+    )
+
+    .then(data => {
+
+        console.log(data);
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+    });
+
+}
+
+
+answerElement.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (event.key === "Enter") {
+
+            submitAnswer();
+
+        }
+
+    }
+);
+
+
+showQuestion();
+
+startTimer();
+
+</script>
+
+</body>
+
+</html>

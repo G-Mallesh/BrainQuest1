@@ -1,0 +1,37 @@
+<h1>🏆 Badges</h1>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<a href="{{ url_for('admin_dashboard') }}">
+    ← Admin Dashboard
+</a>
+
+<br><br>
+
+<div class="admin-grid">
+
+{% for badge in badges %}
+
+<div class="admin-card">
+
+    <h3>
+        🏆 {{ badge.badge_name }}
+    </h3>
+
+    <p>
+        {{ badge.description }}
+    </p>
+
+    <p>
+        Required XP:
+        {{ badge.required_xp }}
+    </p>
+
+    <p>
+        Type:
+        {{ badge.badge_type }}
+    </p>
+
+</div>
+
+{% endfor %}
+
+</div>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>English</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="study-container">
+
+    <div class="study-header">
+
+        <a href="{{ url_for('study') }}">
+            ← Study Zone
+        </a>
+
+        <h1>📖 English</h1>
+
+        <span>{{ class_name }}</span>
+
+    </div>
+
+
+    <div class="lesson-grid">
+
+        <div class="lesson-card">
+
+            <h2>🔤 Vocabulary</h2>
+
+            <p>
+                Learn new words and
+                their meanings.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>📝 Grammar</h2>
+
+            <p>
+                Learn nouns, verbs,
+                adjectives and sentences.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>📚 Reading</h2>
+
+            <p>
+                Improve reading
+                and comprehension.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>✍️ Writing</h2>
+
+            <p>
+                Practice sentences,
+                paragraphs and creative writing.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🔤 Spelling</h2>
+
+            <p>
+                Practice spelling
+                through interactive activities.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>📖 Stories</h2>
+
+            <p>
+                Read educational and
+                moral stories.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

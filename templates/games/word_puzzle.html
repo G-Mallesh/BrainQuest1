@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Word Puzzle - BrainQuest</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(
+                135deg,
+                #667eea,
+                #764ba2
+            );
+
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-container {
+            width: 90%;
+            max-width: 600px;
+
+            background: white;
+
+            padding: 35px;
+
+            border-radius: 20px;
+
+            text-align: center;
+
+            box-shadow:
+                0 10px 30px
+                rgba(0, 0, 0, 0.25);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #666;
+        }
+
+        .word {
+            margin: 30px 0;
+
+            font-size: 40px;
+
+            font-weight: bold;
+
+            letter-spacing: 10px;
+
+            color: #667eea;
+        }
+
+        input {
+            width: 80%;
+
+            padding: 14px;
+
+            font-size: 18px;
+
+            border: 2px solid #667eea;
+
+            border-radius: 10px;
+
+            text-align: center;
+        }
+
+        button {
+            margin-top: 15px;
+
+            padding: 12px 25px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #667eea;
+
+            color: white;
+
+            font-size: 17px;
+
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #4d61d1;
+        }
+
+        #message {
+            margin-top: 20px;
+
+            font-size: 20px;
+
+            font-weight: bold;
+        }
+
+        .score {
+            margin-top: 15px;
+
+            font-size: 18px;
+        }
+
+        .back {
+            display: inline-block;
+
+            margin-top: 20px;
+
+            color: #667eea;
+
+            text-decoration: none;
+
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="game-container">
+
+    <h1>🧩 Word Puzzle</h1>
+
+    <p class="description">
+        Unscramble the letters and find the correct word.
+    </p>
+
+    <div class="word" id="word">
+        TCA
+    </div>
+
+    <input
+        type="text"
+        id="answer"
+        placeholder="Enter your answer"
+        autocomplete="off"
+    >
+
+    <br>
+
+    <button onclick="checkAnswer()">
+        Check Answer
+    </button>
+
+    <div id="message"></div>
+
+    <div class="score">
+        ⭐ Score:
+        <span id="score">0</span>
+    </div>
+
+    <button onclick="nextQuestion()">
+        ➡️ Next Question
+    </button>
+
+    <br>
+
+    <a href="{{ url_for('games') }}" class="back">
+        ← Back to Games
+    </a>
+
+</div>
+
+
+<script>
+
+const questions = [
+
+    {
+        word: "TCA",
+        answer: "CAT"
+    },
+
+    {
+        word: "GOD",
+        answer: "DOG"
+    },
+
+    {
+        word: "RAT",
+        answer: "ART"
+    },
+
+    {
+        word: "TAC",
+        answer: "CAT"
+    },
+
+    {
+        word: "RAE",
+        answer: "EAR"
+    },
+
+    {
+        word: "NUS",
+        answer: "SUN"
+    },
+
+    {
+        word: "PEN",
+        answer: "PEN"
+    },
+
+    {
+        word: "KOOB",
+        answer: "BOOK"
+    }
+
+];
+
+
+let currentQuestion = 0;
+
+let score = 0;
+
+
+function loadQuestion() {
+
+    document.getElementById("word").innerText =
+        questions[currentQuestion].word;
+
+    document.getElementById("answer").value = "";
+
+    document.getElementById("message").innerText = "";
+
+}
+
+
+function checkAnswer() {
+
+    const answer =
+        document
+        .getElementById("answer")
+        .value
+        .trim()
+        .toUpperCase();
+
+    const correctAnswer =
+        questions[currentQuestion].answer;
+
+    if (answer === correctAnswer) {
+
+        score += 20;
+
+        document.getElementById("score").innerText =
+            score;
+
+        document.getElementById("message").innerText =
+            "🎉 Correct! +20 points";
+
+    } else {
+
+        document.getElementById("message").innerText =
+            "❌ Wrong answer. Try again!";
+
+    }
+
+}
+
+
+function nextQuestion() {
+
+    currentQuestion++;
+
+    if (currentQuestion >= questions.length) {
+
+        currentQuestion = 0;
+
+    }
+
+    loadQuestion();
+
+}
+
+
+document
+    .getElementById("answer")
+    .addEventListener("keypress", function(event) {
+
+        if (event.key === "Enter") {
+
+            checkAnswer();
+
+        }
+
+    });
+
+
+loadQuestion();
+
+</script>
+
+</body>
+
+</html>

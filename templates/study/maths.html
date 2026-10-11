@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Mathematics</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="study-container">
+
+    <div class="study-header">
+
+        <a href="{{ url_for('study') }}">
+            ← Study Zone
+        </a>
+
+        <h1>➕ Mathematics</h1>
+
+        <span>{{ class_name }}</span>
+
+    </div>
+
+
+    <div class="lesson-grid">
+
+
+        {% if class_name in
+            ['Class 1', 'Class 2', 'Class 3'] %}
+
+        <div class="lesson-card">
+
+            <h2>🔢 Numbers</h2>
+
+            <p>
+                Learn counting, number names,
+                place values and comparisons.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>➕ Addition</h2>
+
+            <p>
+                Learn how to add numbers
+                using simple examples.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>➖ Subtraction</h2>
+
+            <p>
+                Practice taking one number
+                away from another.
+            </p>
+
+        </div>
+
+
+        {% elif class_name in
+            ['Class 4', 'Class 5'] %}
+
+        <div class="lesson-card">
+
+            <h2>✖️ Multiplication</h2>
+
+            <p>
+                Learn multiplication tables
+                and multiplication problems.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>➗ Division</h2>
+
+            <p>
+                Learn division and
+                division problems.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>📐 Geometry</h2>
+
+            <p>
+                Learn lines, angles,
+                shapes and measurements.
+            </p>
+
+        </div>
+
+
+        {% elif class_name in
+            ['Class 6', 'Class 7', 'Class 8'] %}
+
+        <div class="lesson-card">
+
+            <h2>🔢 Integers</h2>
+
+            <p>
+                Positive numbers, negative
+                numbers and number operations.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>🍰 Fractions</h2>
+
+            <p>
+                Learn fractions, decimals
+                and percentages.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>📐 Algebra</h2>
+
+            <p>
+                Introduction to variables,
+                expressions and equations.
+            </p>
+
+        </div>
+
+
+        {% else %}
+
+        <div class="lesson-card">
+
+            <h2>📐 Algebra</h2>
+
+            <p>
+                Equations, expressions
+                and algebraic identities.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>📊 Statistics</h2>
+
+            <p>
+                Mean, median, mode,
+                tables and graphs.
+            </p>
+
+        </div>
+
+
+        <div class="lesson-card">
+
+            <h2>📐 Geometry</h2>
+
+            <p>
+                Triangles, circles,
+                coordinate geometry and areas.
+            </p>
+
+        </div>
+
+
+        {% endif %}
+
+
+        <!-- Common topic -->
+
+        <div class="lesson-card">
+
+            <h2>🧮 Practice</h2>
+
+            <p>
+                Improve your calculation
+                skills with BrainQuest games.
+            </p>
+
+            <a
+                href="{{ url_for('calculation_game') }}"
+                class="study-button"
+            >
+                Play Maths Game
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

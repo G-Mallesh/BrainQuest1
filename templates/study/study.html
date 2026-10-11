@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Study Zone</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="study-container">
+
+    <!-- Header -->
+
+    <div class="study-header">
+
+        <a href="{{ url_for('dashboard') }}">
+            🏠 Dashboard
+        </a>
+
+        <h1>📚 Study Zone</h1>
+
+        <span>
+            {{ class_name }}
+        </span>
+
+    </div>
+
+
+    <!-- Introduction -->
+
+    <div class="study-intro">
+
+        <h2>
+            Welcome to your Study Zone! 🎓
+        </h2>
+
+        <p>
+            Your lessons are designed for
+            <strong>{{ class_name }}</strong>.
+        </p>
+
+        <p>
+            Choose a subject to start learning.
+        </p>
+
+    </div>
+
+
+    <!-- Subjects -->
+
+    <div class="subject-grid">
+
+
+        <!-- Maths -->
+
+        <div class="subject-card">
+
+            <div class="subject-icon">
+                ➕
+            </div>
+
+            <h2>
+                Mathematics
+            </h2>
+
+            <p>
+                Numbers, calculations,
+                geometry and problem solving.
+            </p>
+
+            <a
+                href="{{ url_for('study_maths') }}"
+                class="study-button"
+            >
+                Start Maths
+            </a>
+
+        </div>
+
+
+        <!-- Science -->
+
+        <div class="subject-card">
+
+            <div class="subject-icon">
+                🔬
+            </div>
+
+            <h2>
+                Science
+            </h2>
+
+            <p>
+                Plants, animals, space,
+                energy and experiments.
+            </p>
+
+            <a
+                href="{{ url_for('study_science') }}"
+                class="study-button"
+            >
+                Start Science
+            </a>
+
+        </div>
+
+
+        <!-- English -->
+
+        <div class="subject-card">
+
+            <div class="subject-icon">
+                📖
+            </div>
+
+            <h2>
+                English
+            </h2>
+
+            <p>
+                Grammar, vocabulary,
+                reading and writing.
+            </p>
+
+            <a
+                href="{{ url_for('study_english') }}"
+                class="study-button"
+            >
+                Start English
+            </a>
+
+        </div>
+
+
+        <!-- Social -->
+
+        <div class="subject-card">
+
+            <div class="subject-icon">
+                🌍
+            </div>
+
+            <h2>
+                Social Studies
+            </h2>
+
+            <p>
+                History, geography,
+                society and civics.
+            </p>
+
+            <a
+                href="{{ url_for('study_social') }}"
+                class="study-button"
+            >
+                Start Social
+            </a>
+
+        </div>
+
+
+        <!-- GK -->
+
+        <div class="subject-card">
+
+            <div class="subject-icon">
+                🧠
+            </div>
+
+            <h2>
+                General Knowledge
+            </h2>
+
+            <p>
+                Interesting facts,
+                countries, science and more.
+            </p>
+
+            <a
+                href="{{ url_for('study_gk') }}"
+                class="study-button"
+            >
+                Learn GK
+            </a>
+
+        </div>
+
+
+        <!-- Computer -->
+
+        <div class="subject-card">
+
+            <div class="subject-icon">
+                💻
+            </div>
+
+            <h2>
+                Computer Science
+            </h2>
+
+            <p>
+                Computers, coding,
+                internet and technology.
+            </p>
+
+            <a
+                href="{{ url_for('study_computer') }}"
+                class="study-button"
+            >
+                Learn Computers
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

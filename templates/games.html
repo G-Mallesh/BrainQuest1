@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BrainQuest Games</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #222;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .dashboard {
+            display: inline-block;
+            margin-bottom: 25px;
+            padding: 10px 18px;
+            background: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .game-card {
+            background: white;
+            padding: 22px;
+            border-radius: 15px;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.10);
+        }
+
+        .game-card h2 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .game-card p {
+            color: #555;
+            margin: 8px 0;
+        }
+
+        .active {
+            color: green;
+            font-weight: bold;
+        }
+
+        .play-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 11px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .play-btn:hover {
+            background: #4f63d2;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🎮 BrainQuest Games</h1>
+
+    <p class="subtitle">
+        Choose a game and start learning!
+    </p>
+
+    <a href="{{ url_for('dashboard') }}" class="dashboard">
+        ← Dashboard
+    </a>
+
+    <div class="games-grid">
+
+        {% for game in games %}
+
+        <div class="game-card">
+
+            <h2>🎮 {{ game.service_name if game.service_name else game.name }}</h2>
+
+            <p>
+                <strong>Type:</strong>
+                {{ game.game_type if game.game_type else game.type }}
+            </p>
+
+            <p>
+                <strong>Difficulty:</strong>
+                {{ game.difficulty }}
+            </p>
+
+            <p>
+                <strong>Points:</strong>
+                {{ game.points }}
+            </p>
+
+            <p class="active">
+                🟢 Active
+            </p>
+
+            {% set game_type = game.game_type if game.game_type else game.type %}
+
+            {% if game_type == "word" %}
+                <a href="{{ url_for('word_puzzle') }}" class="play-btn">
+                    ▶️ Play Game
+                </a>
+
+            {% elif game_type == "sequence" %}
+                <a href="{{ url_for('number_sequence') }}" class="play-btn">
+                    ▶️ Play Game
+                </a>
+
+            {% elif game_type == "quiz" %}
+                <a href="{{ url_for('brain_quiz') }}" class="play-btn">
+                    ▶️ Play Game
+                </a>
+
+            {% elif game_type == "image_matching" %}
+                <a href="{{ url_for('image_matching') }}" class="play-btn">
+                    ▶️ Play Game
+                </a>
+
+            {% elif game_type == "animal" %}
+                <a href="{{ url_for('animal_match') }}" class="play-btn">
+                    ▶️ Play Game
+                </a>
+
+            {% elif game_type == "memory" %}
+                <a href="{{ url_for('memory_cards') }}" class="play-btn">
+                    ▶️ Play Game
+                </a>
+
+            {% elif game_type == "calculation" %}
+                <a href="{{ url_for('quick_calculation') }}" class="play-btn">
+                    ▶️ Play Game
+                </a>
+
+            {% else %}
+                <a href="#" class="play-btn">
+                    🚧 Coming Soon
+                </a>
+            {% endif %}
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</body>
+</html>
