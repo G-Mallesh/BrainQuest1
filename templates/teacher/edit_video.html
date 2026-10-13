@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Video</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
+</head>
+
+<body>
+
+<div class="teacher-container">
+
+    <div class="teacher-header">
+
+        <h1>🎬 Edit Video</h1>
+
+        <a
+            href="{{ url_for('teacher_videos') }}"
+            class="teacher-primary-button"
+        >
+            ← Back
+        </a>
+
+    </div>
+
+    <section class="teacher-form-section">
+
+        <form
+            method="POST"
+            enctype="multipart/form-data"
+            class="teacher-form"
+        >
+
+            <label>Video Title</label>
+
+            <input
+                type="text"
+                name="title"
+                value="{{ video.title }}"
+                required
+            >
+
+            <label>Description</label>
+
+            <textarea name="description">{{ video.description or '' }}</textarea>
+
+            <label>Category</label>
+
+            <input
+                type="text"
+                name="category"
+                value="{{ video.category }}"
+                required
+            >
+
+            <label>Video Type</label>
+
+            <select name="video_type">
+
+                {% for value in [
+                    'education',
+                    'animal',
+                    'story',
+                    'drawing',
+                    'game',
+                    'other'
+                ] %}
+
+                <option
+                    value="{{ value }}"
+                    {% if video.video_type == value %}
+                    selected
+                    {% endif %}
+                >
+                    {{ value.title() }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+            <label>Class</label>
+
+            <select name="class_id">
+
+                <option value="">
+                    All Classes
+                </option>
+
+                {% for class_item in classes %}
+
+                <option
+                    value="{{ class_item.id }}"
+                    {% if video.class_id == class_item.id %}
+                    selected
+                    {% endif %}
+                >
+                    {{ class_item.class_name }}
+                </option>
+
+                {% endfor %}
+
+            </select>
+
+            <label>Duration (seconds)</label>
+
+            <input
+                type="number"
+                name="duration_seconds"
+                value="{{ video.duration_seconds or 0 }}"
+                min="0"
+            >
+
+            <input
+                type="hidden"
+                name="old_video_path"
+                value="{{ video.video_path or '' }}"
+            >
+
+            <input
+                type="hidden"
+                name="old_thumbnail_path"
+                value="{{ video.thumbnail_path or '' }}"
+            >
+
+            <label>Upload Video</label>
+
+            <input
+                type="file"
+                name="video_file"
+                accept="video/mp4,video/webm,video/quicktime"
+            >
+
+            <label>Upload Thumbnail</label>
+
+            <input
+                type="file"
+                name="thumbnail_file"
+                accept="image/*"
+            >
+
+            <button
+                type="submit"
+                class="teacher-primary-button"
+            >
+                💾 Update Video
+            </button>
+
+        </form>
+
+    </section>
+
+</div>
+
+</body>
+</html>

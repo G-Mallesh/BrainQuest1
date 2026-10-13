@@ -1,248 +1,105 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teacher Stories</title>
 
     <link rel="stylesheet"
-          href="{{ url_for(
-              'static',
-              filename='css/style.css'
-          ) }}">
-
+          href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-
-
 <body>
 
 <div class="teacher-container">
 
-
-    <!-- HEADER -->
     <div class="teacher-header">
-
         <div>
-
-            <h1>
-                📚 Story Management
-            </h1>
-
-            <p>
-                Create and manage educational stories for students.
-            </p>
-
+            <h1>📖 Story Management</h1>
+            <p>Create educational stories for students.</p>
         </div>
 
-
-        <a href="{{ url_for(
-            'teacher_dashboard'
-        ) }}">
+        <a href="{{ url_for('teacher_dashboard') }}">
             ← Dashboard
         </a>
-
     </div>
 
-
-
-    <!-- MAIN SECTION -->
     <section class="teacher-section">
 
-
-        <!-- ADD STORY -->
         <div class="question-toolbar">
-
-            <a
-                href="{{ url_for(
-                    'teacher_add_story'
-                ) }}"
-                class="teacher-primary-button"
-            >
+            <a href="{{ url_for('teacher_add_story') }}"
+               class="teacher-primary-button">
                 ➕ Add Story
             </a>
-
         </div>
 
-
-
-        <!-- STORY GRID -->
         <div class="teacher-content-grid">
-
 
             {% for story in stories %}
 
-
-            <!-- STORY CARD -->
             <div class="teacher-content-card">
 
-
-                <!-- STORY IMAGE -->
                 {% if story.cover_image %}
-
                 <img
-                    src="{{ url_for(
-                        'uploaded_file',
-                        filename=story.cover_image
-                    ) }}"
+                    src="{{ url_for('uploaded_file', filename=story.cover_image) }}"
                     alt="{{ story.title }}"
-                    style="
-                        width: 100%;
-                        height: 180px;
-                        object-fit: cover;
-                        border-radius: 12px;
-                        margin-bottom: 15px;
-                    "
+                    style="width:100%; max-height:220px; object-fit:cover;"
                 >
-
                 {% else %}
-
-                <div class="teacher-content-icon">
-                    📖
-                </div>
-
+                <div class="teacher-content-icon">📖</div>
                 {% endif %}
 
+                <h3>{{ story.title }}</h3>
 
-
-                <!-- TITLE -->
-                <h3>
-                    {{ story.title }}
-                </h3>
-
-
-
-                <!-- DESCRIPTION -->
-                {% if story.description %}
+                <p>Category: {{ story.category }}</p>
 
                 <p>
-                    {{ story.description }}
+                    Reading Time:
+                    {{ story.reading_time }} minutes
                 </p>
-
-                {% endif %}
-
-
-
-                <!-- CATEGORY -->
-                {% if story.category %}
 
                 <p>
-                    📚
-                    <strong>Category:</strong>
-                    {{ story.category|capitalize }}
+                    Class: {{ story.class_name or 'All Classes' }}
                 </p>
 
-                {% endif %}
+                <span class="content-status">
+                    {{ story.status }}
+                </span>
 
+                <br><br>
 
+                <a href="{{ url_for('teacher_edit_story', story_id=story.id) }}"
+                   class="teacher-primary-button">
+                    ✏️ Edit
+                </a>
 
-                <!-- CLASS -->
-                <p>
-                    🎓
-                    <strong>Class:</strong>
-                    {{ story.class_name or "All Classes" }}
-                </p>
+                <form method="POST"
+                      action="{{ url_for('teacher_delete_story', story_id=story.id) }}"
+                      style="display:inline;"
+                      onsubmit="return confirm('Delete this story?');">
 
+                    <button type="submit" class="delete-button">
+                        🗑️ Delete
+                    </button>
 
-
-                <!-- STORY TYPE -->
-                {% if story.story_type %}
-
-                <p>
-                    📖
-                    <strong>Type:</strong>
-                    {{ story.story_type|capitalize }}
-                </p>
-
-                {% endif %}
-
-
-
-                <!-- STATUS -->
-                <p>
-
-                    <strong>Status:</strong>
-
-                    <span class="content-status">
-                        {{ story.status }}
-                    </span>
-
-                </p>
-
-
-
-                <!-- ACTION BUTTONS -->
-                <div style="margin-top: 15px;">
-
-
-                    <!-- EDIT -->
-                    <a
-                        href="{{ url_for(
-                            'teacher_edit_story',
-                            story_id=story.id
-                        ) }}"
-                        class="teacher-primary-button"
-                    >
-                        ✏️ Edit
-                    </a>
-
-
-
-                    <!-- DELETE -->
-                    <form
-                        method="POST"
-                        action="{{ url_for(
-                            'teacher_delete_story',
-                            story_id=story.id
-                        ) }}"
-                        style="display:inline;"
-                        onsubmit="return confirm(
-                            'Delete this story?'
-                        );"
-                    >
-
-                        <button
-                            type="submit"
-                            class="delete-button"
-                        >
-                            🗑️ Delete
-                        </button>
-
-                    </form>
-
-
-                </div>
-
+                </form>
 
             </div>
-
 
             {% else %}
 
-
-            <!-- NO STORIES -->
             <div class="empty-progress">
-
-                📚 No stories available.
-
+                <h3>No Stories Available</h3>
+                <p>Click Add Story to create your first story.</p>
             </div>
-
 
             {% endfor %}
 
-
         </div>
 
-
     </section>
-
 
 </div>
 
 </body>
-
 </html>

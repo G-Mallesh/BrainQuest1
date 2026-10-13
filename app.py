@@ -1,18 +1,17 @@
-import os
 
+import os
+from uuid import uuid4
 from flask import (
     Flask,
     render_template,
     request,
     redirect,
     url_for,
-    session,
     flash,
-    send_from_directory,
-    jsonify
+    session,
+    jsonify,
+    send_from_directory
 )
-
-from werkzeug.utils import secure_filename
 
 import mysql.connector
 from reportlab.lib.pagesizes import A4
@@ -23,110 +22,42 @@ from werkzeug.security import (
     generate_password_hash,
     check_password_hash
 )
-
-from backend import student
+from werkzeug.utils import secure_filename
 from config import DB_CONFIG, SECRET_KEY
 
-
-# =========================================================
-# FLASK APP
-# =========================================================
-
+# Initialize Flask application
 app = Flask(__name__)
 
+# Configure secret key
 app.secret_key = SECRET_KEY
 
+# Define base directory
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# =========================================================
-# BASE DIRECTORY
-# =========================================================
-
-BASE_DIR = os.path.dirname(
-    os.path.abspath(__file__)
-)
-
-
-# =========================================================
-# UPLOAD FOLDERS
-# =========================================================
-
-UPLOAD_FOLDER = os.path.join(
-    BASE_DIR,
-    "uploads"
-)
+# Define upload directories
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+IMAGE_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, "images")
+VIDEO_UPLOAD_FOLDER = os.path.join(UPLOAD_FOLDER, "videos")
 
 PROFILE_UPLOAD_FOLDER = os.path.join(
     UPLOAD_FOLDER,
-    "profiles"
-)
-
-IMAGE_UPLOAD_FOLDER = os.path.join(
-    UPLOAD_FOLDER,
-    "images"
-)
-
-VIDEO_UPLOAD_FOLDER = os.path.join(
-    UPLOAD_FOLDER,
-    "videos"
-)
-
+    "profiles")
 DRAWING_UPLOAD_FOLDER = os.path.join(
     UPLOAD_FOLDER,
     "drawings"
-)
-
-
-# =========================================================
-# CREATE FOLDERS
-# =========================================================
-
-os.makedirs(
-    UPLOAD_FOLDER,
-    exist_ok=True
-)
-
-os.makedirs(
-    PROFILE_UPLOAD_FOLDER,
-    exist_ok=True
-)
-
-os.makedirs(
-    IMAGE_UPLOAD_FOLDER,
-    exist_ok=True
-)
-
-os.makedirs(
-    VIDEO_UPLOAD_FOLDER,
-    exist_ok=True
-)
-
-os.makedirs(
-    DRAWING_UPLOAD_FOLDER,
-    exist_ok=True
-)
-
-
-# =========================================================
-# FLASK UPLOAD CONFIGURATION
-# =========================================================
-
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
-app.config["PROFILE_UPLOAD_FOLDER"] = PROFILE_UPLOAD_FOLDER
-
-app.config["IMAGE_UPLOAD_FOLDER"] = IMAGE_UPLOAD_FOLDER
-
-app.config["VIDEO_UPLOAD_FOLDER"] = VIDEO_UPLOAD_FOLDER
-
-app.config["DRAWING_UPLOAD_FOLDER"] = DRAWING_UPLOAD_FOLDER
-
-app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024
-
-
-# =========================================================
-# ALLOWED FILE TYPES
-# =========================================================
-
+)    
+# Create upload directories if they do not exist
+os.makedirs(IMAGE_UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(VIDEO_UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(PROFILE_UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(DRAWING_UPLOAD_FOLDER, exist_ok=True)
+# Route to serve uploaded files
+@app.route("/uploads/<path:filename>")
+def uploaded_file(filename):
+    return send_from_directory(
+        UPLOAD_FOLDER,
+        filename
+    )
 ALLOWED_IMAGE_EXTENSIONS = {
     "png",
     "jpg",
@@ -142,281 +73,18 @@ ALLOWED_VIDEO_EXTENSIONS = {
 }
 
 
-# =========================================================
-# FILE VALIDATION
-# =========================================================
-
-def allowed_file(filename, extensions):
-
+def allowed_file(filename, allowed_extensions):
     return (
         "." in filename
         and filename.rsplit(".", 1)[1].lower()
-        in extensions
+        in allowed_extensions
     )
-
-
 # =========================================================
 # DATABASE CONNECTION
 # =========================================================
 
 def get_db_connection():
-
-    return mysql.connector.connect(
-        **DB_CONFIG
-    )
-
-
-
-# =========================================================
-# HOME
-# =========================================================
-
-@app.route("/")
-def home():
-
-    return render_template(
-        "index.html"
-    )
-
-
-# =========================================================
-# DATABASE TEST
-# =========================================================
-
-@app.route("/test-db")
-def test_db():
-
-    connection = None
-    cursor = None
-
-    try:
-
-        connection = get_db_connection()
-
-        cursor = connection.cursor()
-
-        cursor.execute(
-            "SELECT DATABASE()"
-        )
-
-        result = cursor.fetchone()
-
-        database_name = (
-            result[0]
-            if result
-            else "Unknown"
-        )
-
-        return f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Database Test</title>
-            <style>
-                body {{
-                    font-family: Arial, sans-serif;
-                    text-align: center;
-                    padding: 60px;
-                    background: #f4f8ff;
-                }}
-
-                .box {{
-                    max-width: 600px;
-                    margin: auto;
-                    background: white;
-                    padding: 40px;
-                    border-radius: 15px;
-                    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-                }}
-
-                h1 {{
-                    color: green;
-                }}
-
-                a {{
-                    display: inline-block;
-                    margin-top: 20px;
-                    padding: 12px 25px;
-                    background: #2563eb;
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 8px;
-                }}
-            </style>
-        </head>
-
-        <body>
-
-            <div class="box">
-
-                <h1>✅ Database Connected</h1>
-
-                <p>
-                    MySQL connection is working successfully.
-                </p>
-
-                <p>
-                    <strong>Database:</strong>
-                    {database_name}
-                </p>
-
-                <a href="/">
-                    Go Home
-                </a>
-
-            </div>
-
-        </body>
-        </html>
-        """
-
-    except mysql.connector.Error as error:
-
-        return f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Database Error</title>
-            <style>
-                body {{
-                    font-family: Arial, sans-serif;
-                    text-align: center;
-                    padding: 60px;
-                    background: #fff5f5;
-                }}
-
-                .box {{
-                    max-width: 700px;
-                    margin: auto;
-                    background: white;
-                    padding: 40px;
-                    border-radius: 15px;
-                    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-                }}
-
-                h1 {{
-                    color: red;
-                }}
-
-                .error {{
-                    background: #fee2e2;
-                    padding: 15px;
-                    border-radius: 8px;
-                    color: #991b1b;
-                    word-wrap: break-word;
-                }}
-
-                a {{
-                    display: inline-block;
-                    margin-top: 20px;
-                    padding: 12px 25px;
-                    background: #2563eb;
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 8px;
-                }}
-            </style>
-        </head>
-
-        <body>
-
-            <div class="box">
-
-                <h1>❌ Database Connection Failed</h1>
-
-                <div class="error">
-                    {error}
-                </div>
-
-                <a href="/">
-                    Go Home
-                </a>
-
-            </div>
-
-        </body>
-        </html>
-        """
-
-    except Exception as error:
-
-        return f"""
-        <h1>❌ Unexpected Error</h1>
-        <p>{error}</p>
-        <a href="/">Home</a>
-        """
-
-    finally:
-
-        if cursor is not None:
-
-            try:
-                cursor.close()
-            except Exception:
-                pass
-
-        if connection is not None:
-
-            try:
-                connection.close()
-            except Exception:
-                pass
-
-
-# =========================================================
-# UPLOAD FILE SERVING
-# =========================================================
-
-@app.route("/uploads/<path:filename>")
-def uploaded_file(filename):
-
-    return send_from_directory(
-        UPLOAD_FOLDER,
-        filename
-    )
-
-
-# =========================================================
-# HEALTH CHECK
-# =========================================================
-
-@app.route("/health")
-def health():
-
-    return jsonify({
-        "status": "ok",
-        "app": "BrainQuest"
-    })
-
-
-# =========================================================
-# 404 ERROR
-# =========================================================
-
-@app.errorhandler(404)
-def page_not_found(error):
-
-    return """
-    <h1>404 - Page Not Found</h1>
-    <p>The requested page does not exist.</p>
-    <a href="/">Go Home</a>
-    """, 404
-
-
-# =========================================================
-# 500 ERROR
-# =========================================================
-
-@app.errorhandler(500)
-def internal_server_error(error):
-
-    return """
-    <h1>500 - Internal Server Error</h1>
-    <p>Something went wrong on the server.</p>
-    <a href="/">Go Home</a>
-    """, 500
-
-
+    return mysql.connector.connect(**DB_CONFIG)
 
 # =========================================================
 # BADGE SYSTEM
@@ -432,7 +100,7 @@ def update_student_rewards(
         SELECT total_xp
         FROM student_xp
         WHERE student_id = %s
-    """, (student_id,))
+   BASE_DIR """, (student_id,))
 
     xp_row = cursor.fetchone()
 
@@ -498,7 +166,6 @@ def update_student_rewards(
                 student_id,
                 badge["badge_name"]
             ))
-
 # =========================================================
 # DAILY STREAK SYSTEM
 # =========================================================
@@ -641,7 +308,6 @@ def update_student_rewards(cursor, student_id):
 
 
     # Award badges
-
     check_and_award_achievement_badges(
         cursor,
         student_id,
@@ -891,7 +557,58 @@ def check_and_award_achievement_badges(
             "Brain Champion"
         )
 
-           
+# =========================================================
+# HOME
+# =========================================================
+
+@app.route("/")
+def home():
+
+    return render_template("index.html")
+
+
+# =========================================================
+# DATABASE TEST
+# =========================================================
+
+@app.route("/test-db")
+def test_db():
+
+    connection = None
+    cursor = None
+
+    try:
+
+        connection = get_db_connection()
+
+        cursor = connection.cursor()
+
+        cursor.execute("SELECT DATABASE()")
+
+        database_name = cursor.fetchone()[0]
+
+        return f"""
+        <h1>✅ Database Connected</h1>
+        <p>Database: {database_name}</p>
+        <a href="/">Home</a>
+        """
+
+    except mysql.connector.Error as error:
+
+        return f"""
+        <h1>❌ Database Connection Failed</h1>
+        <p>{error}</p>
+        """
+
+    finally:
+
+        if cursor:
+            cursor.close()
+
+        if connection:
+            connection.close()
+
+
 # =========================================================
 # REGISTER
 # =========================================================
@@ -899,72 +616,40 @@ def check_and_award_achievement_badges(
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
-    # =====================================================
-    # POST - CREATE NEW STUDENT
-    # =====================================================
-
     if request.method == "POST":
 
         full_name = request.form.get(
-            "full_name",
-            ""
+            "full_name", ""
         ).strip()
 
         email = request.form.get(
-            "email",
-            ""
+            "email", ""
         ).strip().lower()
 
         phone = request.form.get(
-            "phone",
-            ""
+            "phone", ""
         ).strip()
 
         password = request.form.get(
-            "password",
-            ""
+            "password", ""
         )
 
         education_level = request.form.get(
-            "education_level",
-            ""
-        ).strip().lower()
+            "education_level", ""
+        )
 
         class_id = request.form.get(
-            "class_id",
-            ""
-        ).strip()
+            "class_id", ""
+        )
 
-
-        # =================================================
-        # REQUIRED FIELD VALIDATION
-        # =================================================
-
+        # Validate required fields
         if not full_name or not email or not password:
-
-            flash(
-                "Please fill all required fields."
-            )
-
-            return redirect(
-                url_for("register")
-            )
-
+            flash("Please fill all required fields.")
+            return redirect(url_for("register"))
 
         if not education_level or not class_id:
-
-            flash(
-                "Please select education level and class."
-            )
-
-            return redirect(
-                url_for("register")
-            )
-
-
-        # =================================================
-        # ALLOWED EDUCATION LEVELS
-        # =================================================
+            flash("Please select education level and class.")
+            return redirect(url_for("register"))
 
         allowed_levels = [
             "primary",
@@ -972,27 +657,14 @@ def register():
             "secondary"
         ]
 
-
         if education_level not in allowed_levels:
-
-            flash(
-                "Invalid education level."
-            )
-
-            return redirect(
-                url_for("register")
-            )
-
+            flash("Invalid education level.")
+            return redirect(url_for("register"))
 
         connection = None
         cursor = None
 
-
         try:
-
-            # =============================================
-            # DATABASE CONNECTION
-            # =============================================
 
             connection = get_db_connection()
 
@@ -1000,100 +672,50 @@ def register():
                 dictionary=True
             )
 
-
-            # =============================================
-            # CHECK CLASS
-            # =============================================
-
+            # Check selected class
             cursor.execute(
                 """
-                SELECT
-                    id,
-                    class_name,
-                    education_level
+                SELECT id, class_name, education_level
                 FROM classes
                 WHERE id = %s
                 """,
-                (
-                    class_id,
-                )
+                (class_id,)
             )
 
             selected_class = cursor.fetchone()
 
-
             if not selected_class:
+                flash("Invalid class selected.")
+                return redirect(url_for("register"))
 
-                flash(
-                    "Invalid class selected."
-                )
-
-                return redirect(
-                    url_for("register")
-                )
-
-
-            # =============================================
-            # CHECK EDUCATION LEVEL MATCH
-            # =============================================
-
-            if (
-                selected_class["education_level"]
-                != education_level
-            ):
-
+            if selected_class["education_level"] != education_level:
                 flash(
                     "Class does not match education level."
                 )
+                return redirect(url_for("register"))
 
-                return redirect(
-                    url_for("register")
-                )
-
-
-            # =============================================
-            # CHECK EMAIL
-            # =============================================
-
+            # Check whether email already exists
             cursor.execute(
                 """
-                SELECT
-                    id
+                SELECT id
                 FROM students
                 WHERE email = %s
                 """,
-                (
-                    email,
-                )
+                (email,)
             )
 
             existing_student = cursor.fetchone()
 
-
             if existing_student:
+                flash("Email already registered.")
+                return redirect(url_for("register"))
 
-                flash(
-                    "Email already registered."
-                )
-
-                return redirect(
-                    url_for("register")
-                )
-
-
-            # =============================================
-            # PASSWORD HASHING
-            # =============================================
-
+            # Hash password
             hashed_password = generate_password_hash(
                 password
             )
 
-
-            # =============================================
-            # CREATE STUDENT
-            # =============================================
-
+            # Create student
             cursor.execute(
                 """
                 INSERT INTO students
@@ -1105,15 +727,7 @@ def register():
                     role,
                     class_id
                 )
-                VALUES
-                (
-                    %s,
-                    %s,
-                    %s,
-                    %s,
-                    'student',
-                    %s
-                )
+                VALUES (%s, %s, %s, %s, 'student', %s)
                 """,
                 (
                     full_name,
@@ -1124,25 +738,13 @@ def register():
                 )
             )
 
-
-            # =============================================
-            # GET NEW STUDENT ID
-            # =============================================
-
+            # Get newly created student ID
             student_id = cursor.lastrowid
 
-
-            # =============================================
-            # GENERATE CHILD CODE
-            # =============================================
-
+            # Generate automatic child code
             child_code = f"BQ{student_id:05d}"
 
-
-            # =============================================
-            # SAVE CHILD CODE
-            # =============================================
-
+            # Save child code in students table
             cursor.execute(
                 """
                 UPDATE students
@@ -1155,11 +757,7 @@ def register():
                 )
             )
 
-
-            # =============================================
-            # CREATE XP RECORD
-            # =============================================
-
+            # Create initial XP record
             cursor.execute(
                 """
                 INSERT INTO student_xp
@@ -1169,95 +767,49 @@ def register():
                     current_level,
                     current_streak
                 )
-                VALUES
-                (
-                    %s,
-                    0,
-                    1,
-                    0
-                )
+                VALUES (%s, 0, 1, 0)
                 """,
-                (
-                    student_id,
-                )
+                (student_id,)
             )
 
-
-            # =============================================
-            # COMMIT EVERYTHING
-            # =============================================
-
+            # Save all changes
             connection.commit()
 
-
-            # =============================================
-            # SUCCESS MESSAGE
-            # =============================================
+            print(
+                f"New student registered: "
+                f"{student_id}, Child Code: {child_code}"
+            )
 
             flash(
-                f"🎉 Registration successful! "
-                f"Your Child Code is {child_code}"
+                "🎉 Registration successful! "
+                f"Your Child Code is {child_code}. "
+                "Please login."
             )
 
-
-            return redirect(
-                url_for("login")
-            )
-
-
-        # =================================================
-        # DATABASE ERROR
-        # =================================================
+            return redirect(url_for("login"))
 
         except mysql.connector.Error as error:
 
             if connection:
-
                 connection.rollback()
 
+            print("Registration Error:", error)
 
-            print(
-                "Registration Error:",
-                error
-            )
+            flash("❌ Registration failed.")
 
-
-            flash(
-                "❌ Registration failed. "
-                "Please try again."
-            )
-
-
-            return redirect(
-                url_for("register")
-            )
-
-
-        # =================================================
-        # CLOSE DATABASE
-        # =================================================
+            return redirect(url_for("register"))
 
         finally:
 
             if cursor:
-
                 cursor.close()
 
-
             if connection:
-
                 connection.close()
 
-
-    # =====================================================
-    # GET - LOAD REGISTRATION PAGE
-    # =====================================================
-
+    # GET request: Load available classes
     connection = None
     cursor = None
-
-    classes = []
-
 
     try:
 
@@ -1266,11 +818,6 @@ def register():
         cursor = connection.cursor(
             dictionary=True
         )
-
-
-        # ================================================
-        # LOAD CLASSES
-        # ================================================
 
         cursor.execute(
             """
@@ -1283,45 +830,27 @@ def register():
             """
         )
 
-
         classes = cursor.fetchall()
-
 
     except mysql.connector.Error as error:
 
-        print(
-            "Class Loading Error:",
-            error
-        )
+        print("Class Loading Error:", error)
 
         classes = []
-
 
     finally:
 
         if cursor:
-
             cursor.close()
 
 
         if connection:
-
             connection.close()
-
-
-    # =====================================================
-    # SHOW REGISTER PAGE
-    # =====================================================
 
     return render_template(
         "register.html",
         classes=classes
     )
-
-# =========================================================
-# LOGIN
-# =========================================================
-
 # =========================================================
 # LOGIN
 # =========================================================
@@ -1331,48 +860,19 @@ def login():
 
     if request.method == "POST":
 
-        email = request.form.get(
-            "email",
-            ""
-        ).strip().lower()
-
-        password = request.form.get(
-            "password",
-            ""
-        )
-
-        # -------------------------------------------------
-        # VALIDATION
-        # -------------------------------------------------
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
 
         if not email or not password:
-
-            flash(
-                "Please enter email and password."
-            )
-
-            return redirect(
-                url_for("login")
-            )
+            flash("Please enter email and password.")
+            return redirect(url_for("login"))
 
         connection = None
         cursor = None
 
         try:
-
-            # -------------------------------------------------
-            # DATABASE CONNECTION
-            # -------------------------------------------------
-
             connection = get_db_connection()
-
-            cursor = connection.cursor(
-                dictionary=True
-            )
-
-            # -------------------------------------------------
-            # FIND USER
-            # -------------------------------------------------
+            cursor = connection.cursor(dictionary=True)
 
             cursor.execute(
                 """
@@ -1385,166 +885,853 @@ def login():
                     s.class_id,
                     c.class_name,
                     c.education_level
-
                 FROM students s
-
                 LEFT JOIN classes c
                     ON s.class_id = c.id
-
                 WHERE s.email = %s
                   AND s.status = 'active'
                 """,
                 (email,)
             )
 
-            student = cursor.fetchone()
+            user = cursor.fetchone()
 
-            # -------------------------------------------------
-            # USER NOT FOUND
-            # -------------------------------------------------
+            if not user:
+                flash("Email or password is incorrect.")
+                return redirect(url_for("login"))
 
-            if not student:
-
-                flash(
-                    "❌ Email or password is incorrect."
-                )
-
-                return redirect(
-                    url_for("login")
-                )
-
-            # -------------------------------------------------
-            # CHECK PASSWORD
-            # -------------------------------------------------
-
+            # Check password before creating a session
             if not check_password_hash(
-                student["password"],
-                password
+                user["password"], password
             ):
+                flash("Email or password is incorrect.")
+                return redirect(url_for("login"))
 
-                flash(
-                    "❌ Email or password is incorrect."
-                )
-
-                return redirect(
-                    url_for("login")
-                )
-
-            # -------------------------------------------------
-            # CREATE SESSION
-            # -------------------------------------------------
-
+            # Create session
             session.clear()
 
-            session["student_id"] = student["id"]
+            session["student_id"] = user["id"]
+            session["student_name"] = user["full_name"]
+            session["student_email"] = user["email"]
+            session["role"] = user["role"]
+            session["class_id"] = user["class_id"]
+            session["class_name"] = user["class_name"]
+            session["education_level"] = user["education_level"]
 
-            session["student_name"] = student[
-                "full_name"
-            ]
+            # Redirect according to role
+            if user["role"] == "teacher":
+                return redirect(url_for("teacher_dashboard"))
 
-            session["student_email"] = student[
-                "email"
-            ]
-
-            session["role"] = student[
-                "role"
-            ]
-
-            session["class_id"] = student[
-                "class_id"
-            ]
-
-            session["class_name"] = student[
-                "class_name"
-            ]
-
-            session["education_level"] = student[
-                "education_level"
-            ]
-
-            # -------------------------------------------------
-            # STUDENT REWARDS
-            # -------------------------------------------------
-
-            if student["role"] == "student":
-
-                try:
-
-                    update_student_rewards(
-                        cursor,
-                        student["id"]
-                    )
-
-                    connection.commit()
-
-                except Exception as reward_error:
-
-                    print(
-                        "Reward Update Error:",
-                        reward_error
-                    )
-
-            # -------------------------------------------------
-            # ROLE-BASED REDIRECT
-            # -------------------------------------------------
-
-            if student["role"] == "teacher":
-
-                return redirect(
-                    url_for("teacher_dashboard")
-                )
-
-            elif student["role"] == "admin":
-
-                return redirect(
-                    url_for("admin_dashboard")
-                )
+            elif user["role"] == "admin":
+                return redirect(url_for("admin_dashboard"))
 
             else:
-
-                return redirect(
-                    url_for("dashboard")
-                )
-
-        # -----------------------------------------------------
-        # DATABASE ERROR
-        # -----------------------------------------------------
+                return redirect(url_for("dashboard"))
 
         except mysql.connector.Error as error:
-
-            print(
-                "Login Error:",
-                error
-            )
-
-            flash(
-                "Database error. Please try again."
-            )
-
-            return redirect(
-                url_for("login")
-            )
-
-        # -----------------------------------------------------
-        # CLOSE DATABASE
-        # -----------------------------------------------------
+            print("Login Error:", error)
+            flash("Database error. Please try again.")
+            return redirect(url_for("login"))
 
         finally:
-
             if cursor:
-
                 cursor.close()
 
             if connection:
-
                 connection.close()
 
-    # ---------------------------------------------------------
-    # LOGIN PAGE
-    # ---------------------------------------------------------
+    return render_template("login.html")
+# =========================================================
+# TEACHER PANEL
+# =========================================================
+
+@app.route("/teacher-dashboard")
+def teacher_dashboard():
+
+    if "student_id" not in session:
+        flash("Please login first.")
+        return redirect(url_for("login"))
+
+    if session.get("role") != "teacher":
+        flash("Teacher access required.")
+        return redirect(url_for("dashboard"))
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    # Total students
+    cursor.execute("""
+        SELECT COUNT(*) AS total
+        FROM students
+        WHERE role = 'student'
+    """)
+
+    student_count = cursor.fetchone()["total"]
+
+
+    # Total questions
+    cursor.execute("""
+        SELECT COUNT(*) AS total
+        FROM questions
+    """)
+
+    question_count = cursor.fetchone()["total"]
+
+
+    # Total games
+    cursor.execute("""
+        SELECT COUNT(*) AS total
+        FROM games
+    """)
+
+    game_count = cursor.fetchone()["total"]
+
+
+    # Total stories
+    cursor.execute("""
+        SELECT COUNT(*) AS total
+        FROM stories
+        WHERE status = 'active'
+    """)
+
+    story_count = cursor.fetchone()["total"]
+
+
+    # Total videos
+    cursor.execute("""
+        SELECT COUNT(*) AS total
+        FROM videos
+        WHERE status = 'active'
+    """)
+
+    video_count = cursor.fetchone()["total"]
+
+
+    # Total tasks
+    cursor.execute("""
+        SELECT COUNT(*) AS total
+        FROM tasks
+        WHERE status = 'active'
+    """)
+
+    task_count = cursor.fetchone()["total"]
+
+
+    cursor.close()
+    connection.close()
+
 
     return render_template(
-        "login.html"
+        "teacher/teacher_dashboard.html",
+        student_count=student_count,
+        question_count=question_count,
+        game_count=game_count,
+        story_count=story_count,
+        video_count=video_count,
+        task_count=task_count
+    )
+
+@app.route("/teacher/students")
+def teacher_students():
+
+    if "student_id" not in session:
+        flash("Please login first.")
+        return redirect(url_for("login"))
+
+    if session.get("role") != "teacher":
+        flash("Teacher access required.")
+        return redirect(url_for("dashboard"))
+
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+
+    cursor.execute("""
+        SELECT
+            s.id,
+            s.full_name,
+            s.email,
+            s.phone,
+            s.city,
+            s.status,
+            c.class_name,
+
+            COALESCE(
+                x.total_xp,
+                0
+            ) AS total_xp,
+
+            COALESCE(
+                x.current_level,
+                1
+            ) AS current_level,
+
+            COALESCE(
+                x.current_streak,
+                0
+            ) AS current_streak
+
+        FROM students s
+
+        LEFT JOIN classes c
+            ON s.class_id = c.id
+
+        LEFT JOIN student_xp x
+            ON s.id = x.student_id
+
+        WHERE s.role = 'student'
+
+        ORDER BY s.id DESC
+    """)
+
+
+    students = cursor.fetchall()
+
+
+    cursor.close()
+    connection.close()
+
+
+    return render_template(
+        "teacher/students.html",
+        students=students
+    )
+@app.route("/teacher/questions")
+def teacher_questions():
+
+    if "student_id" not in session:
+        flash("Please login first.")
+        return redirect(url_for("login"))
+
+    if session.get("role") != "teacher":
+        flash("Teacher access required.")
+        return redirect(url_for("dashboard"))
+
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+
+    cursor.execute("""
+        SELECT
+            q.id,
+            q.question_text,
+            q.correct_answer,
+            q.points,
+            q.difficulty,
+            g.title AS game_title
+
+        FROM questions q
+
+        LEFT JOIN games g
+            ON q.game_id = g.id
+
+        ORDER BY q.id DESC
+    """)
+
+
+    questions = cursor.fetchall()
+
+
+    cursor.close()
+    connection.close()
+
+
+    return render_template(
+        "teacher/questions.html",
+        questions=questions
+    )
+@app.route(
+    "/teacher/questions/add",
+    methods=["GET", "POST"]
+)
+def teacher_add_question():
+
+    if "student_id" not in session:
+        flash("Please login first.")
+        return redirect(url_for("login"))
+
+    if session.get("role") != "teacher":
+        flash("Teacher access required.")
+        return redirect(url_for("dashboard"))
+
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+
+    if request.method == "POST":
+
+        game_id = request.form.get("game_id")
+
+        question_text = request.form.get(
+            "question_text"
+        )
+
+        option_a = request.form.get(
+            "option_a"
+        )
+
+        option_b = request.form.get(
+            "option_b"
+        )
+
+        option_c = request.form.get(
+            "option_c"
+        )
+
+        option_d = request.form.get(
+            "option_d"
+        )
+
+        correct_answer = request.form.get(
+            "correct_answer"
+        )
+
+        explanation = request.form.get(
+            "explanation"
+        )
+
+        points = request.form.get(
+            "points",
+            10
+        )
+
+        difficulty = request.form.get(
+            "difficulty",
+            "easy"
+        )
+
+
+        if not question_text:
+            flash("Question is required.")
+
+            cursor.close()
+            connection.close()
+
+            return redirect(
+                url_for("teacher_add_question")
+            )
+
+
+        cursor.execute("""
+            INSERT INTO questions
+            (
+                game_id,
+                question_text,
+                option_a,
+                option_b,
+                option_c,
+                option_d,
+                correct_answer,
+                explanation,
+                points,
+                difficulty
+            )
+
+            VALUES
+            (
+                %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s
+            )
+        """, (
+            game_id if game_id else None,
+            question_text,
+            option_a,
+            option_b,
+            option_c,
+            option_d,
+            correct_answer,
+            explanation,
+            int(points),
+            difficulty
+        ))
+
+
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+
+        flash("Question added successfully!")
+
+        return redirect(
+            url_for("teacher_questions")
+        )
+
+
+    # Load games
+
+    cursor.execute("""
+        SELECT
+            id,
+            title,
+            game_type
+        FROM games
+        ORDER BY title
+    """)
+
+    games = cursor.fetchall()
+
+
+    cursor.close()
+    connection.close()
+
+
+    return render_template(
+        "teacher/add_question.html",
+        games=games)
+    
+# =========================================================
+# TEACHER STORY MANAGEMENT
+# =========================================================
+
+@app.route("/teacher/stories")
+def teacher_stories():
+
+    if "student_id" not in session:
+        flash("Please login first.")
+        return redirect(url_for("login"))
+
+    if session.get("role") != "teacher":
+        flash("Teacher access required.")
+        return redirect(url_for("dashboard"))
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT
+            s.id,
+            s.title,
+            s.category,
+            s.reading_time,
+            s.status,
+            c.class_name
+        FROM stories s
+        LEFT JOIN classes c
+            ON s.class_id = c.id
+        ORDER BY s.id DESC
+    """)
+
+    stories = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return render_template(
+        "teacher/stories.html",
+        stories=stories
+    )
+@app.route(
+    "/teacher/stories/add",
+    methods=["GET", "POST"]
+)
+def teacher_add_story():
+
+    if "student_id" not in session:
+        flash("Please login first.")
+        return redirect(url_for("login"))
+
+    if session.get("role") != "teacher":
+        flash("Teacher access required.")
+        return redirect(url_for("dashboard"))
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    if request.method == "POST":
+
+        title = request.form.get("title")
+        description = request.form.get("description")
+        story_text = request.form.get("story_text")
+        category = request.form.get("category")
+        class_id = request.form.get("class_id")
+        reading_time = request.form.get(
+            "reading_time",
+            5
+        )
+
+        cover_image = request.form.get(
+            "cover_image"
+        )
+
+        if not title or not story_text:
+            flash("Title and story content are required.")
+
+            cursor.close()
+            connection.close()
+
+            return redirect(
+                url_for("teacher_add_story")
+            )
+
+        cursor.execute("""
+            INSERT INTO stories
+            (
+                title,
+                description,
+                story_text,
+                cover_image,
+                category,
+                class_id,
+                reading_time,
+                status
+            )
+            VALUES
+            (
+                %s, %s, %s, %s,
+                %s, %s, %s, 'active'
+            )
+        """, (
+            title,
+            description,
+            story_text,
+            cover_image,
+            category,
+            class_id if class_id else None,
+            int(reading_time)
+        ))
+
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        flash("Story added successfully!")
+
+        return redirect(
+            url_for("teacher_stories")
+        )
+
+    cursor.execute("""
+        SELECT
+            id,
+            class_name
+        FROM classes
+        ORDER BY id
+    """)
+
+    classes = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return render_template(
+        "teacher/add_story.html",
+        classes=classes
+    )
+# =========================================================
+# TEACHER VIDEO MANAGEMENT
+# =========================================================
+
+@app.route("/teacher/videos")
+def teacher_videos():
+
+    if "student_id" not in session:
+        flash("Please login first.")
+        return redirect(url_for("login"))
+
+    if session.get("role") != "teacher":
+        flash("Teacher access required.")
+        return redirect(url_for("dashboard"))
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT
+            v.id,
+            v.title,
+            v.category,
+            v.video_type,
+            v.duration_seconds,
+            v.status,
+            c.class_name
+        FROM videos v
+        LEFT JOIN classes c
+            ON v.class_id = c.id
+        ORDER BY v.id DESC
+    """)
+
+    videos = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return render_template(
+        "teacher/videos.html",
+        videos=videos
+    )
+@app.route(
+    "/teacher/videos/add",
+    methods=["GET", "POST"]
+)
+def teacher_add_video():
+
+    if "student_id" not in session:
+        flash("Please login first.")
+        return redirect(url_for("login"))
+
+    if session.get("role") != "teacher":
+        flash("Teacher access required.")
+        return redirect(url_for("dashboard"))
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    if request.method == "POST":
+
+        title = request.form.get("title")
+        description = request.form.get("description")
+        video_path = request.form.get("video_path")
+        thumbnail_path = request.form.get(
+            "thumbnail_path"
+        )
+
+        category = request.form.get("category")
+
+        video_type = request.form.get(
+            "video_type"
+        )
+
+        class_id = request.form.get("class_id")
+
+        duration = request.form.get(
+            "duration_seconds",
+            0
+        )
+
+
+        if not title or not video_path:
+
+            flash(
+                "Title and video path are required."
+            )
+
+            cursor.close()
+            connection.close()
+
+            return redirect(
+                url_for("teacher_add_video")
+            )
+
+
+        cursor.execute("""
+            INSERT INTO videos
+            (
+                title,
+                description,
+                video_path,
+                thumbnail_path,
+                category,
+                video_type,
+                class_id,
+                duration_seconds,
+                status
+            )
+            VALUES
+            (
+                %s, %s, %s, %s,
+                %s, %s, %s, %s, 'active'
+            )
+        """, (
+            title,
+            description,
+            video_path,
+            thumbnail_path,
+            category,
+            video_type,
+            class_id if class_id else None,
+            int(duration)
+        ))
+
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        flash("Video added successfully!")
+
+        return redirect(
+            url_for("teacher_videos")
+        )
+
+
+    cursor.execute("""
+        SELECT
+            id,
+            class_name
+        FROM classes
+        ORDER BY id
+    """)
+
+    classes = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return render_template(
+        "teacher/add_video.html",
+        classes=classes
+    )
+# =========================================================
+# TEACHER TASK MANAGEMENT
+# =========================================================
+
+@app.route("/teacher/tasks")
+def teacher_tasks():
+
+    if "student_id" not in session:
+        flash("Please login first.")
+        return redirect(url_for("login"))
+
+    if session.get("role") != "teacher":
+        flash("Teacher access required.")
+        return redirect(url_for("dashboard"))
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT
+            t.id,
+            t.title,
+            t.description,
+            t.task_type,
+            t.points,
+            t.due_date,
+            t.status,
+            c.class_name
+        FROM tasks t
+        LEFT JOIN classes c
+            ON t.class_id = c.id
+        ORDER BY t.id DESC
+    """)
+
+    tasks = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return render_template(
+        "teacher/tasks.html",
+        tasks=tasks
+    )
+@app.route(
+    "/teacher/tasks/add",
+    methods=["GET", "POST"]
+)
+def teacher_add_task():
+
+    if "student_id" not in session:
+        flash("Please login first.")
+        return redirect(url_for("login"))
+
+    if session.get("role") != "teacher":
+        flash("Teacher access required.")
+        return redirect(url_for("dashboard"))
+
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    if request.method == "POST":
+
+        title = request.form.get("title")
+
+        description = request.form.get(
+            "description"
+        )
+
+        task_type = request.form.get(
+            "task_type"
+        )
+
+        class_id = request.form.get(
+            "class_id"
+        )
+
+        points = request.form.get(
+            "points",
+            10
+        )
+
+        due_date = request.form.get(
+            "due_date"
+        )
+
+
+        if not title:
+
+            flash("Task title is required.")
+
+            cursor.close()
+            connection.close()
+
+            return redirect(
+                url_for("teacher_add_task")
+            )
+
+
+        cursor.execute("""
+            INSERT INTO tasks
+            (
+                title,
+                description,
+                task_type,
+                class_id,
+                points,
+                due_date,
+                status
+            )
+            VALUES
+            (
+                %s, %s, %s,
+                %s, %s, %s,
+                'active'
+            )
+        """, (
+            title,
+            description,
+            task_type,
+            class_id if class_id else None,
+            int(points),
+            due_date if due_date else None
+        ))
+
+
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+
+        flash("Task created successfully!")
+
+        return redirect(
+            url_for("teacher_tasks")
+        )
+
+
+    cursor.execute("""
+        SELECT
+            id,
+            class_name
+        FROM classes
+        ORDER BY id
+    """)
+
+    classes = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+
+    return render_template(
+        "teacher/add_task.html",
+        classes=classes
     )
 # =========================================================
 # DASHBOARD
@@ -1821,6 +2008,7 @@ def dashboard():
         xp_percentage=xp_percentage,
         xp_remaining=xp_remaining
     )
+
 # =========================================================
 # LOGOUT
 # =========================================================
@@ -2615,7 +2803,6 @@ def save_animal_quiz():
 
         if connection:
             connection.close()
-
 # =========================================================
 # MEMORY SHARP
 # =========================================================
@@ -2897,7 +3084,7 @@ def save_memory_score():
             )
 
         update_student_rewards(
-        cursor,
+    cursor,
     session["student_id"]
 )
         connection.commit()
@@ -2936,6 +3123,7 @@ def save_memory_score():
 
         if connection:
 
+
             connection.close()
 # =========================================================
 # PAINT & DRAWING
@@ -2952,6 +3140,7 @@ def drawing():
             url_for("login")
         )
 
+
     return render_template(
         "drawing/drawing.html"
     )
@@ -2961,272 +3150,195 @@ def drawing():
 # SAVE DRAWING
 # =========================================================
 
-@app.route("/drawing/save", methods=["POST"])
+@app.route(
+    "/drawing/save",
+    methods=["POST"]
+)
 def save_drawing():
 
     if "student_id" not in session:
 
-        return jsonify({
+        return {
             "success": False,
             "message": "Login required"
-        }), 401
+        }, 401
+
+
+    data = request.get_json()
+
+
+    title = data.get(
+        "title",
+        "My Drawing"
+    ).strip()
+
+
+    drawing_data = data.get(
+        "drawing_data",
+        ""
+    )
+
+
+    if not drawing_data:
+
+        return {
+            "success": False,
+            "message": "Drawing is empty."
+        }, 400
+
+
+    if len(drawing_data) > 5_000_000:
+
+        return {
+            "success": False,
+            "message": "Drawing is too large."
+        }, 400
+
+
+    connection = None
+
+    cursor = None
+
 
     try:
 
-        data = request.get_json(silent=True)
+        connection = get_db_connection()
 
-        if not data:
+        cursor = connection.cursor()
 
-            return jsonify({
-                "success": False,
-                "message": "No drawing data received."
-            }), 400
 
-        title = str(
-            data.get(
-                "title",
-                "My Drawing"
+        cursor.execute(
+            """
+            INSERT INTO drawings
+            (
+                student_id,
+                title,
+                drawing_type,
+                drawing_data,
+                score,
+                status
             )
-        ).strip()
-
-        if not title:
-
-            title = "My Drawing"
-
-        drawing_data = data.get(
-            "drawing_data",
-            ""
+            VALUES
+            (
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s
+            )
+            """,
+            (
+                session["student_id"],
+                title,
+                "free_draw",
+                drawing_data,
+                0,
+                "saved"
+            )
         )
 
-        if not drawing_data:
 
-            return jsonify({
-                "success": False,
-                "message": "Drawing is empty."
-            }), 400
+        # Give 10 XP for saving a drawing
 
-        # Prevent very large drawings
-        if len(drawing_data) > 5_000_000:
+        cursor.execute(
+            """
+            UPDATE student_xp
 
-            return jsonify({
-                "success": False,
-                "message": "Drawing is too large."
-            }), 400
+            SET total_xp =
+                total_xp + 10
 
-        connection = None
-        cursor = None
-
-        try:
-
-            connection = get_db_connection()
-
-            cursor = connection.cursor()
-
-            # -------------------------------------------------
-            # SAVE DRAWING
-            # -------------------------------------------------
-
-            cursor.execute(
-                """
-                INSERT INTO drawings
-                (
-                    student_id,
-                    title,
-                    drawing_type,
-                    drawing_data,
-                    score,
-                    status
-                )
-                VALUES
-                (
-                    %s,
-                    %s,
-                    %s,
-                    %s,
-                    %s,
-                    %s
-                )
-                """,
-                (
-                    session["student_id"],
-                    title,
-                    "free_draw",
-                    drawing_data,
-                    0,
-                    "saved"
-                )
+            WHERE student_id = %s
+            """,
+            (
+                session["student_id"],
             )
+        )
 
-            # -------------------------------------------------
-            # CHECK STUDENT XP RECORD
-            # -------------------------------------------------
+
+        # Update level
+
+        cursor.execute(
+            """
+            SELECT total_xp
+            FROM student_xp
+            WHERE student_id = %s
+            """,
+            (
+                session["student_id"],
+            )
+        )
+
+
+        xp_result =cursor.fetchone()
+
+
+        if xp_result:
+
+            total_xp = xp_result[0]
+
+
+            new_level = (
+                total_xp // 100
+            ) + 1
+
 
             cursor.execute(
                 """
-                SELECT total_xp
-                FROM student_xp
+                UPDATE student_xp
+
+                SET current_level = %s
+
                 WHERE student_id = %s
                 """,
                 (
-                    session["student_id"],
-                )
-            )
-
-            xp_result = cursor.fetchone()
-
-            # -------------------------------------------------
-            # CREATE XP RECORD IF MISSING
-            # -------------------------------------------------
-
-            if not xp_result:
-
-                cursor.execute(
-                    """
-                    INSERT INTO student_xp
-                    (
-                        student_id,
-                        total_xp,
-                        current_level
-                    )
-                    VALUES
-                    (
-                        %s,
-                        %s,
-                        %s
-                    )
-                    """,
-                    (
-                        session["student_id"],
-                        10,
-                        1
-                    )
-                )
-
-                total_xp = 10
-
-            else:
-
-                total_xp = int(
-                    xp_result[0] or 0
-                )
-
-                total_xp += 10
-
-                # -------------------------------------------------
-                # CALCULATE LEVEL
-                # -------------------------------------------------
-
-                new_level = (
-                    total_xp // 100
-                ) + 1
-
-                cursor.execute(
-                    """
-                    UPDATE student_xp
-
-                    SET
-                        total_xp = %s,
-                        current_level = %s
-
-                    WHERE student_id = %s
-                    """,
-                    (
-                        total_xp,
-                        new_level,
-                        session["student_id"]
-                    )
-                )
-
-            # -------------------------------------------------
-            # UPDATE REWARDS
-            # -------------------------------------------------
-
-            try:
-
-                update_student_rewards(
-                    cursor,
+                    new_level,
                     session["student_id"]
                 )
-
-            except Exception as reward_error:
-
-                print(
-                    "Reward Update Warning:",
-                    reward_error
-                )
-
-            connection.commit()
-
-            return jsonify({
-                "success": True,
-                "message": "Drawing saved successfully!",
-                "xp": 10,
-                "total_xp": total_xp
-            })
-
-        except mysql.connector.Error as error:
-
-            if connection:
-
-                connection.rollback()
-
-            print(
-                "Drawing Save Database Error:",
-                error
             )
 
-            return jsonify({
-                "success": False,
-                "message": "Database error: " + str(error)
-            }), 500
+        update_student_rewards(
+        cursor,
+        session["student_id"]
+)
+        connection.commit()
 
-        finally:
 
-            if cursor:
+        return {
+            "success": True,
+            "message": "Drawing saved!",
+            "xp": 10
+        }
 
-                cursor.close()
 
-            if connection:
+    except mysql.connector.Error as error:
 
-                connection.close()
+        if connection:
 
-    except Exception as error:
+            connection.rollback()
+
 
         print(
             "Drawing Save Error:",
             error
         )
 
-        return jsonify({
+
+        return {
             "success": False,
-            "message": "Unable to save drawing."
-        }), 500
+            "message": "Database error."
+        }, 500
 
 
-# =========================================================
-# DRAWING DIAGRAMS
-# =========================================================
+    finally:
 
-@app.route("/drawing/diagrams")
-def drawing_diagrams():
+        if cursor:
 
-    if "student_id" not in session:
+            cursor.close()
 
-        flash("Please login first.")
+        if connection:
 
-        return redirect(
-            url_for("login")
-        )
-
-    return render_template(
-        "drawing/drawing_diagrams.html"
-    )
-
-
-# =========================================================
-# COLORING
-# =========================================================
-
+            connection.close()
 @app.route("/drawing/coloring")
 def coloring():
 
@@ -3238,8 +3350,24 @@ def coloring():
             url_for("login")
         )
 
+
     return render_template(
         "drawing/coloring.html"
+    )
+@app.route("/drawing/diagrams")
+def drawing_diagrams():
+
+    if "student_id" not in session:
+
+        flash("Please login first.")
+
+        return redirect(
+            url_for("login")
+        )
+
+
+    return render_template(
+        "drawing/diagrams.html"
     )
 # =========================================================
 # STUDY ZONE
@@ -3600,10 +3728,10 @@ def save_video_progress(video_id):
                 new_level,
                 student_id
             ))
-    update_student_rewards( 
-            cursor, 
-           session["student_id"] 
-)    
+    update_student_rewards(
+    cursor,
+    student_id
+)
     connection.commit()
 
     cursor.close()
@@ -4161,6 +4289,10 @@ def complete_task(task_id):
     update_student_rewards(
     cursor,
     student_id
+)   
+    update_student_rewards(
+    cursor,
+    student_id
 )
     connection.commit()
 
@@ -4429,394 +4561,8 @@ def progress():
         recent_scores=recent_scores,
         level_percentage=level_percentage
     )
-# =========================================================
-# TEACHER PANEL
-# =========================================================
-
-@app.route("/teacher-dashboard")
-def teacher_dashboard():
-
-    if "student_id" not in session:
-        flash("Please login first.")
-        return redirect(url_for("login"))
-
-    if session.get("role") != "teacher":
-        flash("Teacher access required.")
-        return redirect(url_for("dashboard"))
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-    # Total students
-    cursor.execute("""
-        SELECT COUNT(*) AS total
-        FROM students
-        WHERE role = 'student'
-    """)
-
-    student_count = cursor.fetchone()["total"]
-
-
-    # Total questions
-    cursor.execute("""
-        SELECT COUNT(*) AS total
-        FROM questions
-    """)
-
-    question_count = cursor.fetchone()["total"]
-
-
-    # Total games
-    cursor.execute("""
-        SELECT COUNT(*) AS total
-        FROM games
-    """)
-
-    game_count = cursor.fetchone()["total"]
-
-
-    # Total stories
-    cursor.execute("""
-        SELECT COUNT(*) AS total
-        FROM stories
-        WHERE status = 'active'
-    """)
-
-    story_count = cursor.fetchone()["total"]
-
-
-    # Total videos
-    cursor.execute("""
-        SELECT COUNT(*) AS total
-        FROM videos
-        WHERE status = 'active'
-    """)
-
-    video_count = cursor.fetchone()["total"]
-
-
-    # Total tasks
-    cursor.execute("""
-        SELECT COUNT(*) AS total
-        FROM tasks
-        WHERE status = 'active'
-    """)
-
-    task_count = cursor.fetchone()["total"]
-
-
-    cursor.close()
-    connection.close()
-
-
-    return render_template(
-        "teacher/teacher_dashboard.html",
-        student_count=student_count,
-        question_count=question_count,
-        game_count=game_count,
-        story_count=story_count,
-        video_count=video_count,
-        task_count=task_count
-    )
-@app.route("/teacher/students")
-def teacher_students():
-
-    if "student_id" not in session:
-        flash("Please login first.")
-        return redirect(url_for("login"))
-
-    if session.get("role") != "teacher":
-        flash("Teacher access required.")
-        return redirect(url_for("dashboard"))
-
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-
-    cursor.execute("""
-        SELECT
-            s.id,
-            s.full_name,
-            s.email,
-            s.phone,
-            s.city,
-            s.status,
-            c.class_name,
-
-            COALESCE(
-                x.total_xp,
-                0
-            ) AS total_xp,
-
-            COALESCE(
-                x.current_level,
-                1
-            ) AS current_level,
-
-            COALESCE(
-                x.current_streak,
-                0
-            ) AS current_streak
-
-        FROM students s
-
-        LEFT JOIN classes c
-            ON s.class_id = c.id
-
-        LEFT JOIN student_xp x
-            ON s.id = x.student_id
-
-        WHERE s.role = 'student'
-
-        ORDER BY s.id DESC
-    """)
-
-
-    students = cursor.fetchall()
-
-
-    cursor.close()
-    connection.close()
-
-
-    return render_template(
-        "teacher/students.html",
-        students=students
-    )
-@app.route("/teacher/questions")
-def teacher_questions():
-
-    if "student_id" not in session:
-        flash("Please login first.")
-        return redirect(url_for("login"))
-
-    if session.get("role") != "teacher":
-        flash("Teacher access required.")
-        return redirect(url_for("dashboard"))
-
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-
-    cursor.execute("""
-        SELECT
-            q.id,
-            q.question_text,
-            q.correct_answer,
-            q.points,
-            q.difficulty,
-            g.title AS game_title
-
-        FROM questions q
-
-        LEFT JOIN games g
-            ON q.game_id = g.id
-
-        ORDER BY q.id DESC
-    """)
-
-
-    questions = cursor.fetchall()
-
-
-    cursor.close()
-    connection.close()
-
-
-    return render_template(
-        "teacher/questions.html",
-        questions=questions
-    )
-@app.route(
-    "/teacher/questions/add",
-    methods=["GET", "POST"]
-)
-def teacher_add_question():
-
-    if "student_id" not in session:
-        flash("Please login first.")
-        return redirect(url_for("login"))
-
-    if session.get("role") != "teacher":
-        flash("Teacher access required.")
-        return redirect(url_for("dashboard"))
-
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-
-    if request.method == "POST":
-
-        game_id = request.form.get("game_id")
-
-        question_text = request.form.get(
-            "question_text"
-        )
-
-        option_a = request.form.get(
-            "option_a"
-        )
-
-        option_b = request.form.get(
-            "option_b"
-        )
-
-        option_c = request.form.get(
-            "option_c"
-        )
-
-        option_d = request.form.get(
-            "option_d"
-        )
-
-        correct_answer = request.form.get(
-            "correct_answer"
-        )
-
-        explanation = request.form.get(
-            "explanation"
-        )
-
-        points = request.form.get(
-            "points",
-            10
-        )
-
-        difficulty = request.form.get(
-            "difficulty",
-            "easy"
-        )
-
-
-        if not question_text:
-            flash("Question is required.")
-
-            cursor.close()
-            connection.close()
-
-            return redirect(
-                url_for("teacher_add_question")
-            )
-
-
-        cursor.execute("""
-            INSERT INTO questions
-            (
-                game_id,
-                question_text,
-                options_a,
-                options_b,
-                options_c,
-                options_d,
-                correct_answer,
-                explanation,
-                points,
-                difficulty
-            )
-
-            VALUES
-            (
-                %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s
-            )
-        """, (
-            game_id if game_id else None,
-            question_text,
-            option_a,
-            option_b,
-            option_c,
-            option_d,
-            correct_answer,
-            explanation,
-            int(points),
-            difficulty
-        ))
-
-
-        connection.commit()
-
-        cursor.close()
-        connection.close()
-
-
-        flash("Question added successfully!")
-
-        return redirect(
-            url_for("teacher_questions")
-        )
-
-
-    # Load games
-
-    cursor.execute("""
-        SELECT
-            id,
-            title,
-            game_type
-        FROM games
-        ORDER BY title
-    """)
-
-    games = cursor.fetchall()
-
-
-    cursor.close()
-    connection.close()
-
-
-    return render_template(
-        "teacher/add_question.html",
-        games=games
-    )
-# =========================================================
-# TEACHER STORY MANAGEMENT
-# =========================================================
-
-@app.route("/teacher/stories")
-def teacher_stories():
-
-    if "student_id" not in session:
-        flash("Please login first.")
-        return redirect(url_for("login"))
-
-    if session.get("role") != "teacher":
-        flash("Teacher access required.")
-        return redirect(url_for("dashboard"))
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT
-            s.id,
-            s.title,
-            s.category,
-            s.reading_time,
-            s.status,
-            c.class_name
-        FROM stories s
-        LEFT JOIN classes c
-            ON s.class_id = c.id
-        ORDER BY s.id DESC
-    """)
-
-    stories = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return render_template(
-        "teacher/stories.html",
-        stories=stories
-    )
-@app.route(
-    "/teacher/stories/add",
-    methods=["GET", "POST"]
-)
-def teacher_add_story():
+@app.route("/teacher/stories/edit/<int:story_id>", methods=["GET", "POST"])
+def teacher_edit_story(story_id):
 
     if "student_id" not in session:
         flash("Please login first.")
@@ -4836,42 +4582,47 @@ def teacher_add_story():
         story_text = request.form.get("story_text")
         category = request.form.get("category")
         class_id = request.form.get("class_id")
-        reading_time = request.form.get(
-            "reading_time",
-            5
-        )
+        reading_time = request.form.get("reading_time", 5)
 
-        cover_image = request.form.get(
-            "cover_image"
-        )
+        cover_image = request.form.get("old_cover_image")
 
-        if not title or not story_text:
-            flash("Title and story content are required.")
+        image_file = request.files.get("cover_file")
 
-            cursor.close()
-            connection.close()
+        if image_file and image_file.filename:
 
-            return redirect(
-                url_for("teacher_add_story")
-            )
+            if allowed_file(
+                image_file.filename,
+                ALLOWED_IMAGE_EXTENSIONS
+            ):
+
+                filename = secure_filename(image_file.filename)
+
+                unique_filename = (
+                    f"{story_id}_{filename}"
+                )
+
+                image_file.save(
+                    os.path.join(
+                        IMAGE_UPLOAD_FOLDER,
+                        unique_filename
+                    )
+                )
+
+                cover_image = (
+                    f"images/{unique_filename}"
+                )
 
         cursor.execute("""
-            INSERT INTO stories
-            (
-                title,
-                description,
-                story_text,
-                cover_image,
-                category,
-                class_id,
-                reading_time,
-                status
-            )
-            VALUES
-            (
-                %s, %s, %s, %s,
-                %s, %s, %s, 'active'
-            )
+            UPDATE stories
+            SET
+                title=%s,
+                description=%s,
+                story_text=%s,
+                cover_image=%s,
+                category=%s,
+                class_id=%s,
+                reading_time=%s
+            WHERE id=%s
         """, (
             title,
             description,
@@ -4879,7 +4630,8 @@ def teacher_add_story():
             cover_image,
             category,
             class_id if class_id else None,
-            int(reading_time)
+            reading_time,
+            story_id
         ))
 
         connection.commit()
@@ -4887,587 +4639,33 @@ def teacher_add_story():
         cursor.close()
         connection.close()
 
-        flash("Story added successfully!")
+        flash("Story updated successfully!")
 
         return redirect(
             url_for("teacher_stories")
         )
-
-    cursor.execute("""
-        SELECT
-            id,
-            class_name
-        FROM classes
-        ORDER BY id
-    """)
-
-    classes = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return render_template(
-        "teacher/add_story.html",
-        classes=classes
-    )
-# =========================================================
-# TEACHER VIDEO MANAGEMENT
-# =========================================================
-
-@app.route("/teacher/videos")
-def teacher_videos():
-
-    if "student_id" not in session:
-        flash("Please login first.")
-        return redirect(url_for("login"))
-
-    if session.get("role") != "teacher":
-        flash("Teacher access required.")
-        return redirect(url_for("dashboard"))
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT
-            v.id,
-            v.title,
-            v.category,
-            v.video_type,
-            v.duration_seconds,
-            v.status,
-            c.class_name
-        FROM videos v
-        LEFT JOIN classes c
-            ON v.class_id = c.id
-        ORDER BY v.id DESC
-    """)
-
-    videos = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return render_template(
-        "teacher/videos.html",
-        videos=videos
-    )
-@app.route(
-    "/teacher/videos/add",
-    methods=["GET", "POST"]
-)
-def teacher_add_video():
-
-    if "student_id" not in session:
-        flash("Please login first.")
-        return redirect(url_for("login"))
-
-    if session.get("role") != "teacher":
-        flash("Teacher access required.")
-        return redirect(url_for("dashboard"))
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-    if request.method == "POST":
-
-        title = request.form.get("title")
-        description = request.form.get("description")
-        video_path = request.form.get("video_path")
-        thumbnail_path = request.form.get(
-            "thumbnail_path"
-        )
-
-        category = request.form.get("category")
-
-        video_type = request.form.get(
-            "video_type"
-        )
-
-        class_id = request.form.get("class_id")
-
-        duration = request.form.get(
-            "duration_seconds",
-            0
-        )
-
-
-        if not title or not video_path:
-
-            flash(
-                "Title and video path are required."
-            )
-
-            cursor.close()
-            connection.close()
-
-            return redirect(
-                url_for("teacher_add_video")
-            )
-
-
-        cursor.execute("""
-            INSERT INTO videos
-            (
-                title,
-                description,
-                video_path,
-                thumbnail_path,
-                category,
-                video_type,
-                class_id,
-                duration_seconds,
-                status
-            )
-            VALUES
-            (
-                %s, %s, %s, %s,
-                %s, %s, %s, %s, 'active'
-            )
-        """, (
-            title,
-            description,
-            video_path,
-            thumbnail_path,
-            category,
-            video_type,
-            class_id if class_id else None,
-            int(duration)
-        ))
-
-        connection.commit()
-
-        cursor.close()
-        connection.close()
-
-        flash("Video added successfully!")
-
-        return redirect(
-            url_for("teacher_videos")
-        )
-
-
-    cursor.execute("""
-        SELECT
-            id,
-            class_name
-        FROM classes
-        ORDER BY id
-    """)
-
-    classes = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return render_template(
-        "teacher/add_video.html",
-        classes=classes
-    )
-# =========================================================
-# TEACHER TASK MANAGEMENT
-# =========================================================
-
-@app.route("/teacher/tasks")
-def teacher_tasks():
-
-    if "student_id" not in session:
-        flash("Please login first.")
-        return redirect(url_for("login"))
-
-    if session.get("role") != "teacher":
-        flash("Teacher access required.")
-        return redirect(url_for("dashboard"))
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT
-            t.id,
-            t.title,
-            t.description,
-            t.task_type,
-            t.points,
-            t.due_date,
-            t.status,
-            c.class_name
-        FROM tasks t
-        LEFT JOIN classes c
-            ON t.class_id = c.id
-        ORDER BY t.id DESC
-    """)
-
-    tasks = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    return render_template(
-        "teacher/tasks.html",
-        tasks=tasks
-    )
-@app.route(
-    "/teacher/tasks/add",
-    methods=["GET", "POST"]
-)
-def teacher_add_task():
-
-    if "student_id" not in session:
-        flash("Please login first.")
-        return redirect(url_for("login"))
-
-    if session.get("role") != "teacher":
-        flash("Teacher access required.")
-        return redirect(url_for("dashboard"))
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-    if request.method == "POST":
-
-        title = request.form.get("title")
-
-        description = request.form.get(
-            "description"
-        )
-
-        task_type = request.form.get(
-            "task_type"
-        )
-
-        class_id = request.form.get(
-            "class_id"
-        )
-
-        points = request.form.get(
-            "points",
-            10
-        )
-
-        due_date = request.form.get(
-            "due_date"
-        )
-
-
-        if not title:
-
-            flash("Task title is required.")
-
-            cursor.close()
-            connection.close()
-
-            return redirect(
-                url_for("teacher_add_task")
-            )
-
-
-        cursor.execute("""
-            INSERT INTO tasks
-            (
-                title,
-                description,
-                task_type,
-                class_id,
-                points,
-                due_date,
-                status
-            )
-            VALUES
-            (
-                %s, %s, %s,
-                %s, %s, %s,
-                'active'
-            )
-        """, (
-            title,
-            description,
-            task_type,
-            class_id if class_id else None,
-            int(points),
-            due_date if due_date else None
-        ))
-
-
-        connection.commit()
-
-        cursor.close()
-        connection.close()
-
-
-        flash("Task created successfully!")
-
-        return redirect(
-            url_for("teacher_tasks")
-        )
-
-
-    cursor.execute("""
-        SELECT
-            id,
-            class_name
-        FROM classes
-        ORDER BY id
-    """)
-
-    classes = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-
-    return render_template(
-        "teacher/add_task.html",
-        classes=classes
-    )
-@app.route(
-    "/teacher/stories/edit/<int:story_id>",
-    methods=["GET", "POST"]
-)
-def teacher_edit_story(story_id):
-
-    # =========================================================
-    # TEACHER LOGIN CHECK
-    # =========================================================
-
-    if "student_id" not in session:
-        flash("Please login first.")
-        return redirect(url_for("login"))
-
-    if session.get("role") != "teacher":
-        flash("Teacher access required.")
-        return redirect(url_for("dashboard"))
-
-
-    # =========================================================
-    # DATABASE CONNECTION
-    # =========================================================
-
-    connection = get_db_connection()
-    cursor = connection.cursor(dictionary=True)
-
-
-    # =========================================================
-    # POST - UPDATE STORY
-    # =========================================================
-
-    if request.method == "POST":
-
-        title = request.form.get(
-            "title",
-            ""
-        ).strip()
-
-        description = request.form.get(
-            "description",
-            ""
-        ).strip()
-
-        story_text = request.form.get(
-            "story_text",
-            ""
-        ).strip()
-
-        category = request.form.get(
-            "category",
-            ""
-        ).strip()
-
-        class_id = request.form.get(
-            "class_id"
-        )
-
-        reading_time = request.form.get(
-            "reading_time",
-            5
-        )
-
-
-        # =====================================================
-        # OLD COVER IMAGE
-        # =====================================================
-
-        cover_image = request.form.get(
-            "old_cover_image",
-            ""
-        ).strip()
-
-
-        # =====================================================
-        # NEW COVER IMAGE
-        # =====================================================
-
-        image_file = request.files.get(
-            "cover_file"
-        )
-
-        if image_file and image_file.filename:
-
-            if not allowed_file(
-                image_file.filename,
-                ALLOWED_IMAGE_EXTENSIONS
-            ):
-
-                cursor.close()
-                connection.close()
-
-                flash(
-                    "Invalid image format. "
-                    "Use PNG, JPG, JPEG, GIF or WEBP."
-                )
-
-                return redirect(
-                    url_for(
-                        "teacher_edit_story",
-                        story_id=story_id
-                    )
-                )
-
-
-            # Secure filename
-            filename = secure_filename(
-                image_file.filename
-            )
-
-
-            # Unique filename
-            unique_filename = (
-                f"{story_id}_{filename}"
-            )
-
-
-            # Full physical path
-            image_path = os.path.join(
-                app.config["IMAGE_UPLOAD_FOLDER"],
-                unique_filename
-            )
-
-
-            # Save image
-            image_file.save(
-                image_path
-            )
-
-
-            # Database path
-            cover_image = (
-                f"images/{unique_filename}"
-            )
-
-
-        # =====================================================
-        # UPDATE DATABASE
-        # =====================================================
-
-        cursor.execute(
-            """
-            UPDATE stories
-            SET
-                title = %s,
-                description = %s,
-                story_text = %s,
-                cover_image = %s,
-                category = %s,
-                class_id = %s,
-                reading_time = %s
-            WHERE id = %s
-            """,
-            (
-                title,
-                description,
-                story_text,
-                cover_image,
-                category,
-                class_id if class_id else None,
-                reading_time,
-                story_id
-            )
-        )
-
-
-        connection.commit()
-
-
-        # =====================================================
-        # CLOSE DATABASE
-        # =====================================================
-
-        cursor.close()
-        connection.close()
-
-
-        flash(
-            "Story updated successfully!"
-        )
-
-
-        return redirect(
-            url_for("teacher_stories")
-        )
-
-
-    # =========================================================
-    # GET - LOAD STORY
-    # =========================================================
 
     cursor.execute(
-        """
-        SELECT *
-        FROM stories
-        WHERE id = %s
-        """,
+        "SELECT * FROM stories WHERE id=%s",
         (story_id,)
     )
 
     story = cursor.fetchone()
 
-
-    # =========================================================
-    # STORY NOT FOUND
-    # =========================================================
-
-    if not story:
-
-        cursor.close()
-        connection.close()
-
-        flash(
-            "Story not found."
-        )
-
-        return redirect(
-            url_for("teacher_stories")
-        )
-
-
-    # =========================================================
-    # LOAD CLASSES
-    # =========================================================
-
-    cursor.execute(
-        """
-        SELECT
-            id,
-            class_name
+    cursor.execute("""
+        SELECT id, class_name
         FROM classes
         ORDER BY id
-        """
-    )
+    """)
 
     classes = cursor.fetchall()
-
-
-    # =========================================================
-    # CLOSE DATABASE
-    # =========================================================
 
     cursor.close()
     connection.close()
 
-
-    # =========================================================
-    # EDIT STORY PAGE
-    # =========================================================
+    if not story:
+        flash("Story not found.")
+        return redirect(url_for("teacher_stories"))
 
     return render_template(
         "teacher/edit_story.html",
@@ -5770,7 +4968,6 @@ def teacher_edit_task(task_id):
         task=task,
         classes=classes
     )
-
 @app.route("/teacher/tasks/delete/<int:task_id>",
            methods=["POST"])
 def teacher_delete_task(task_id):
@@ -6347,6 +5544,7 @@ def admin_game_status(game_id):
 
     flash("Game status updated.")
 
+    return redirect(url_for("admin_games"))
 @app.route(
     "/admin/games/delete/<int:game_id>",
     methods=["POST"]
@@ -6600,7 +5798,6 @@ def admin_videos():
         videos=videos,
         search=search
     )
-
 @app.route(
     "/admin/videos/status/<int:video_id>",
     methods=["POST"]
@@ -6663,6 +5860,7 @@ def admin_delete_video(video_id):
     flash("Video deleted.")
 
     return redirect(url_for("admin_videos"))
+
 @app.route("/admin/tasks")
 def admin_tasks():
 
@@ -6726,7 +5924,6 @@ def admin_tasks():
         tasks=tasks,
         search=search
     )
-
 @app.route(
     "/admin/tasks/status/<int:task_id>",
     methods=["POST"]
@@ -6890,74 +6087,6 @@ def admin_reports():
         stories=stories,
         videos=videos
     )
-
-
-# =========================================================
-# STUDENT GAMES
-# =========================================================
-
-@app.route("/games")
-def games():
-
-    if "student_id" not in session:
-        flash("Please login first.")
-        return redirect(url_for("login"))
-
-    connection = None
-    cursor = None
-
-    try:
-
-        connection = get_db_connection()
-
-        cursor = connection.cursor(
-            dictionary=True
-        )
-
-        cursor.execute(
-            """
-            SELECT *
-            FROM games
-            ORDER BY id DESC
-            """
-        )
-
-        game_list = cursor.fetchall()
-
-        return render_template(
-            "games.html",
-            games=game_list
-        )
-
-    except mysql.connector.Error as error:
-
-        flash(
-            f"Database error: {error}"
-        )
-
-        return render_template(
-            "games.html",
-            games=[]
-        )
-
-    except Exception as error:
-
-        flash(
-            f"Error loading games: {error}"
-        )
-
-        return render_template(
-            "games.html",
-            games=[]
-        )
-
-    finally:
-
-        if cursor:
-            cursor.close()
-
-        if connection:
-            connection.close()
 @app.route("/profile")
 def profile():
 
@@ -7352,41 +6481,6 @@ def leaderboard():
         "leaderboard.html",
         leaderboard=leaderboard_data
     )
-@app.route("/games/word-puzzle")
-def word_puzzle():
-    return render_template("games/word_puzzle.html")
-
-
-@app.route("/games/number-sequence")
-def number_sequence():
-    return render_template("games/number_sequence.html")
-
-
-@app.route("/games/brain-quiz")
-def brain_quiz():
-    return render_template("games/brain_quiz.html")
-
-
-@app.route("/games/image-matching")
-def image_matching():
-    return render_template("games/image_matching.html")
-
-
-@app.route("/games/animal-match")
-def animal_match():
-    return render_template("games/animal_match.html")
-
-
-@app.route("/games/memory-cards")
-def memory_cards():
-    return render_template("games/memory_cards.html")
-
-
-@app.route("/games/quick-calculation")
-def quick_calculation():
-    return render_template("games/quick_calculation.html")
-
-
 @app.route(
     "/parent/register",
     methods=["GET", "POST"]
@@ -7625,7 +6719,14 @@ def parent_dashboard():
 
         cursor.close()
         connection.close()
+        cursor.execute("""
+    SELECT COUNT(*) AS unread_count
+    FROM parent_notifications
+    WHERE parent_id = %s
+      AND is_read = FALSE
+""", (parent_id,))
 
+        unread_count = cursor.fetchone()["unread_count"]
         return render_template(
             "parent/dashboard.html",
             children=children,
@@ -7800,7 +6901,6 @@ def parent_logout():
     session.pop("parent_email", None)
 
     flash("Logged out successfully.")
-    # Get logged-in parent's ID
 
     return redirect(
         url_for("parent_login")
@@ -7820,6 +6920,90 @@ def parent_link_child():
         return redirect(
             url_for("parent_login")
         )
+
+    if request.method == "POST":
+
+        child_code = request.form.get(
+            "child_code"
+        ).strip().upper()
+
+        relationship = request.form.get(
+            "relationship"
+        ).strip()
+
+        connection = get_db_connection()
+
+        cursor = connection.cursor(
+            dictionary=True
+        )
+
+        # Find child
+
+        cursor.execute("""
+            SELECT
+                id,
+                full_name,
+                status
+            FROM students
+            WHERE child_code=%s
+        """, (child_code,))
+
+        child = cursor.fetchone()
+
+        if not child:
+
+            cursor.close()
+            connection.close()
+
+def create_parent_notification(
+    student_id,
+    title,
+    message,
+    notification_type="achievement"
+):
+    connection = get_db_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            SELECT parent_id
+            FROM parent_students
+            WHERE student_id = %s
+        """, (student_id,))
+
+        parents = cursor.fetchall()
+
+        for parent in parents:
+            cursor.execute("""
+                INSERT INTO parent_notifications (
+                    parent_id,
+                    student_id,
+                    title,
+                    message,
+                    notification_type
+                )
+                VALUES (%s, %s, %s, %s, %s)
+            """, (
+                parent["parent_id"],
+                student_id,
+                title,
+                message,
+                notification_type
+            ))
+
+        connection.commit()
+
+    except Exception:
+        connection.rollback()
+        app.logger.exception(
+            "Failed to create parent notification"
+        )
+        raise
+
+    finally:
+        cursor.close()
+        connection.close()
+     
 
     if request.method == "POST":
 
@@ -7936,6 +7120,8 @@ def parent_link_child():
     return render_template(
         "parent/link_child.html"
     )
+
+        
 @app.route("/parent/weekly-report")
 def parent_weekly_report():
 
@@ -8429,6 +7615,97 @@ def mark_parent_notification_read(
     return redirect(
         url_for("parent_notifications")
     )
+@app.route("/parent/api/subject-progress")
+def parent_subject_progress():
+
+    if "parent_id" not in session:
+        return jsonify({
+            "error": "Login required"
+        }), 401
+
+    child_id = request.args.get(
+        "child_id",
+        type=int
+    )
+
+    if not child_id:
+        return jsonify({
+            "error": "Child ID required"
+        }), 400
+
+    connection = get_db_connection()
+
+    cursor = connection.cursor(
+        dictionary=True
+    )
+
+    # Verify child belongs to parent
+
+    cursor.execute("""
+        SELECT id
+        FROM parent_students
+        WHERE parent_id=%s
+        AND student_id=%s
+    """, (
+        session["parent_id"],
+        child_id
+    ))
+
+    linked = cursor.fetchone()
+
+    if not linked:
+
+        cursor.close()
+        connection.close()
+
+        return jsonify({
+            "error": "Unauthorized"
+        }), 403
+
+    cursor.execute("""
+        SELECT
+            subject,
+            total_activities,
+            completed_activities,
+            average_score
+        FROM progress
+        WHERE student_id=%s
+        ORDER BY subject
+    """, (child_id,))
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    result = []
+
+    for row in rows:
+
+        if row["total_activities"]:
+
+            completion = (
+                row["completed_activities"]
+                / row["total_activities"]
+            ) * 100
+
+        else:
+
+            completion = 0
+
+        result.append({
+            "subject": row["subject"],
+            "completion": round(
+                completion,
+                1
+            ),
+            "average_score":
+                float(
+                    row["average_score"] or 0
+                )
+        })
+
+    return jsonify(result)
 @app.route("/parent/api/weekly-activity")
 def parent_weekly_activity():
 
@@ -8502,50 +7779,44 @@ def parent_weekly_activity():
         }
         for row in rows
     ])
-def create_parent_notification(
-    student_id,
-    title,
-    message,
-    notification_type="achievement"
-):
 
-    connection = get_db_connection()
+@app.route("/games")
+def games_page():
+    return render_template("games.html")
 
-    cursor = connection.cursor()
+@app.route("/games/word-puzzle")
+def word_puzzle():
+    return render_template("games/word_puzzle.html")
 
-    cursor.execute("""
-        SELECT parent_id
-        FROM parent_students
-        WHERE student_id=%s
-    """, (student_id,))
 
-    parents = cursor.fetchall()
+@app.route("/games/number-sequence")
+def number_sequence():
+    return render_template("games/number_sequence.html")
 
-    for parent in parents:
 
-        cursor.execute("""
-            INSERT INTO parent_notifications
-            (
-                parent_id,
-                student_id,
-                title,
-                message,
-                notification_type
-            )
-            VALUES
-            (%s, %s, %s, %s, %s)
-        """, (
-            parent[0],
-            student_id,
-            title,
-            message,
-            notification_type
-        ))
+@app.route("/games/brain-quiz")
+def brain_quiz():
+    return render_template("games/brain_quiz.html")
 
-    connection.commit()
 
-    cursor.close()
-    connection.close()
+@app.route("/games/image-matching")
+def image_matching():
+    return render_template("games/image_matching.html")
+
+
+@app.route("/games/animal-match")
+def animal_match():
+    return render_template("games/animal_match.html")
+
+
+@app.route("/games/memory-cards")
+def memory_cards():
+    return render_template("games/memory_cards.html")
+
+
+@app.route("/games/quick-calculation")
+def quick_calculation():
+    return render_template("games/quick_calculation.html")
 # =========================================================
 # RUN
 # =========================================================

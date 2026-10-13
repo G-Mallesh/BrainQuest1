@@ -1,40 +1,44 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>BrainQuest Games</title>
 
     <style>
+        * { box-sizing: border-box; }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: #f4f7fb;
+            background: #f1f5ff;
+            color: #1e293b;
         }
 
         .container {
-            width: 90%;
-            max-width: 1100px;
+            width: 92%;
+            max-width: 1200px;
             margin: 30px auto;
         }
 
         h1 {
             text-align: center;
-            color: #222;
+            color: #312e81;
+            margin-bottom: 8px;
         }
 
         .subtitle {
             text-align: center;
-            color: #666;
-            margin-bottom: 30px;
+            color: #64748b;
+            margin-bottom: 28px;
         }
 
         .dashboard {
             display: inline-block;
-            margin-bottom: 25px;
-            padding: 10px 18px;
-            background: #333;
+            margin-bottom: 24px;
+            padding: 11px 18px;
+            background: #334155;
             color: white;
             text-decoration: none;
             border-radius: 8px;
@@ -42,140 +46,149 @@
 
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 22px;
         }
 
         .game-card {
             background: white;
-            padding: 22px;
-            border-radius: 15px;
-            box-shadow: 0 5px 18px rgba(0,0,0,0.10);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px #1e293b12;
+            border: 1px solid #e2e8f0;
+            transition: transform .2s, box-shadow .2s;
         }
 
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 28px #1e293b20;
+        }
+
+        .game-icon { font-size: 42px; }
+
         .game-card h2 {
-            margin-top: 0;
-            color: #333;
+            font-size: 21px;
+            color: #312e81;
         }
 
         .game-card p {
-            color: #555;
-            margin: 8px 0;
-        }
-
-        .active {
-            color: green;
-            font-weight: bold;
+            color: #64748b;
+            line-height: 1.6;
         }
 
         .play-btn {
             display: inline-block;
-            margin-top: 15px;
-            padding: 11px 20px;
-            background: #667eea;
+            margin-top: 12px;
+            padding: 12px 18px;
+            background: #4f46e5;
             color: white;
             text-decoration: none;
-            border-radius: 8px;
+            border-radius: 9px;
             font-weight: bold;
         }
 
-        .play-btn:hover {
-            background: #4f63d2;
+        .play-btn:hover { background: #3730a3; }
+
+        .status {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
         }
     </style>
 </head>
 
 <body>
-
 <div class="container">
 
     <h1>🎮 BrainQuest Games</h1>
-
-    <p class="subtitle">
-        Choose a game and start learning!
-    </p>
+    <p class="subtitle">Choose a game and start learning!</p>
 
     <a href="{{ url_for('dashboard') }}" class="dashboard">
-        ← Dashboard
+        ← Student Dashboard
     </a>
+
+    {% set game_list = [
+        {
+            'name': 'Word Puzzle',
+            'type': 'word',
+            'description': 'Improve spelling and vocabulary.',
+            'icon': '🔤',
+            'endpoint': 'word_puzzle'
+        },
+        {
+            'name': 'Number Sequence',
+            'type': 'sequence',
+            'description': 'Discover number patterns.',
+            'icon': '🔢',
+            'endpoint': 'number_sequence'
+        },
+        {
+            'name': 'Brain Quiz',
+            'type': 'quiz',
+            'description': 'Challenge your general knowledge.',
+            'icon': '🧠',
+            'endpoint': 'brain_quiz'
+        },
+        {
+            'name': 'Image Matching',
+            'type': 'image_matching',
+            'description': 'Match pictures and sharpen observation.',
+            'icon': '🖼️',
+            'endpoint': 'image_matching'
+        },
+        {
+            'name': 'Animal Match',
+            'type': 'animal',
+            'description': 'Learn about animals and their names.',
+            'icon': '🐘',
+            'endpoint': 'animal_match'
+        },
+        {
+            'name': 'Memory Cards',
+            'type': 'memory',
+            'description': 'Train your memory with matching cards.',
+            'icon': '🃏',
+            'endpoint': 'memory_cards'
+        },
+        {
+            'name': 'Quick Calculation',
+            'type': 'calculation',
+            'description': 'Practice maths with quick challenges.',
+            'icon': '➕',
+            'endpoint': 'quick_calculation'
+        }
+    ] %}
 
     <div class="games-grid">
 
-        {% for game in games %}
-
+        {% for game in game_list %}
         <div class="game-card">
 
-            <h2>🎮 {{ game.service_name if game.service_name else game.name }}</h2>
+            <div class="game-icon">{{ game.icon }}</div>
 
-            <p>
-                <strong>Type:</strong>
-                {{ game.game_type if game.game_type else game.type }}
-            </p>
+            <h2>{{ game.name }}</h2>
 
-            <p>
-                <strong>Difficulty:</strong>
-                {{ game.difficulty }}
-            </p>
+            <p>{{ game.description }}</p>
 
-            <p>
-                <strong>Points:</strong>
-                {{ game.points }}
-            </p>
+            <p><strong>Type:</strong> {{ game.type|replace('_', ' ')|title }}</p>
 
-            <p class="active">
-                🟢 Active
-            </p>
+            <p class="status">🟢 Ready to play</p>
 
-            {% set game_type = game.game_type if game.game_type else game.type %}
-
-            {% if game_type == "word" %}
-                <a href="{{ url_for('word_puzzle') }}" class="play-btn">
-                    ▶️ Play Game
-                </a>
-
-            {% elif game_type == "sequence" %}
-                <a href="{{ url_for('number_sequence') }}" class="play-btn">
-                    ▶️ Play Game
-                </a>
-
-            {% elif game_type == "quiz" %}
-                <a href="{{ url_for('brain_quiz') }}" class="play-btn">
-                    ▶️ Play Game
-                </a>
-
-            {% elif game_type == "image_matching" %}
-                <a href="{{ url_for('image_matching') }}" class="play-btn">
-                    ▶️ Play Game
-                </a>
-
-            {% elif game_type == "animal" %}
-                <a href="{{ url_for('animal_match') }}" class="play-btn">
-                    ▶️ Play Game
-                </a>
-
-            {% elif game_type == "memory" %}
-                <a href="{{ url_for('memory_cards') }}" class="play-btn">
-                    ▶️ Play Game
-                </a>
-
-            {% elif game_type == "calculation" %}
-                <a href="{{ url_for('quick_calculation') }}" class="play-btn">
-                    ▶️ Play Game
-                </a>
-
-            {% else %}
-                <a href="#" class="play-btn">
-                    🚧 Coming Soon
-                </a>
-            {% endif %}
+            <a href="{{ url_for(game.endpoint) }}" class="play-btn">
+                ▶ Play Game
+            </a>
 
         </div>
-
         {% endfor %}
 
     </div>
-
 </div>
-
 </body>
 </html>

@@ -35,7 +35,9 @@
         </div>
 
         <div class="nav-links">
-
+            <a href="{{ url_for('profile') }}">
+                     👤 Profile
+            </a>
             <a href="{{ url_for('dashboard') }}">
                 Home
             </a>
@@ -44,12 +46,10 @@
                 Study
             </a>
 
-            <a href="#">
+            <a href="{{ url_for('admin_games') }}">
                 Games
             </a>
-            <a href="{{ url_for('profile') }}">
-               👤 Profile
-            </a>
+
             <a href="{{ url_for('animals') }}">
                 Animals
             </a>
@@ -162,6 +162,8 @@
             </div>
 
         </div>
+        
+
 
 
         <div class="quick-stat">
@@ -197,7 +199,7 @@
 
         </div>
 
-
+        
         <div class="quick-stat">
 
             <span>📝</span>
@@ -224,9 +226,9 @@
         <div class="section-heading">
 
             <div>
-
+            
                 <h2>
-                    📚 Learning Hub
+                    Learning Games
                 </h2>
 
                 <p>
@@ -237,9 +239,9 @@
 
         </div>
 
-
         <div class="feature-grid">
-
+             </a>
+         
             <a
                 href="{{ url_for('study') }}"
                 class="feature-card study-card"
@@ -260,7 +262,7 @@
 
 
             <a
-                href="{{ url_for('games') }}"
+                href="{{ url_for('admin_games') }}"
                 class="feature-card game-card"
             >
 
@@ -274,8 +276,7 @@
                     Play games and earn XP.
                 </p>
 
-            </a>
-
+          
 
             <a
                 href="{{ url_for('animals') }}"
@@ -293,7 +294,7 @@
                 </p>
 
             </a>
-
+             
 
             <a
                 href="{{ url_for('drawing') }}"
@@ -329,13 +330,33 @@
                 </p>
 
             </a>
+             
+        
+<!-- Brain Games Card -->
+<a
+    href="{{ url_for('games_page') }}"
+    class="feature-card games-card"
+>
+    <span>🎮</span>
+
+    <h3>
+        Brain Games
+    </h3>
+
+    <p>
+        Play puzzles, memory games, quizzes, and maths challenges.
+    </p>
+</a>
 
 
+ 
+
+      
             <a
                 href="{{ url_for('videos') }}"
                 class="feature-card video-card"
             >
-
+             
                 <span>🎬</span>
 
                 <h3>
@@ -348,7 +369,56 @@
 
             </a>
 
-        </div>
+      
+<!-- Memory Sharp Card -->
+<a
+    href="{{ url_for('memory_game') }}"
+    class="feature-card game-card"
+>
+    <span>🧠</span>
+
+    <h3>
+        Memory Sharp
+    </h3>
+
+    <p>
+        Improve your memory by playing fun matching-card games.
+    </p>
+</a>
+
+       <a
+    href="{{ url_for('leaderboard') }}"
+    class="feature-card"
+>
+
+    <span>🏆</span>
+
+    <h3>
+        Leaderboard
+    </h3>
+
+    <p>
+        See your class XP ranking.
+    </p>
+
+</a>
+<a
+    href="{{ url_for('quiz') }}"
+    class="feature-card"
+>
+
+    <span>🧠</span>
+
+    <h3>
+        Brain Quiz
+    </h3>
+
+    <p>
+        Answer questions and earn XP.
+    </p>
+
+</a>
+</div>
 
     </section>
 
@@ -470,7 +540,7 @@
 
             </div>
 
-            <a href="{{ url_for('games') }}">
+            <a href="{{ url_for('admin_games') }}">
                 View All →
             </a>
 
@@ -572,38 +642,8 @@
         </div>
 
     </section>
-<a
-    href="{{ url_for('leaderboard') }}"
-    class="feature-card"
->
 
-    <span>🏆</span>
 
-    <h3>
-        Leaderboard
-    </h3>
-
-    <p>
-        See your class XP ranking.
-    </p>
-
-</a>
-<a
-    href="{{ url_for('quiz') }}"
-    class="feature-card"
->
-
-    <span>🧠</span>
-
-    <h3>
-        Brain Quiz
-    </h3>
-
-    <p>
-        Answer questions and earn XP.
-    </p>
-
-</a>
     <!-- BADGES -->
 
     <section class="dashboard-section">

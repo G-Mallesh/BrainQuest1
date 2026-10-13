@@ -1,8 +1,18 @@
 <h1>👨‍🏫 Teachers</h1>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
 <a href="{{ url_for('admin_dashboard') }}">
     ← Admin Dashboard
 </a>
+
+<br><br>
+
+<table class="student-table">
 <form method="GET"
       action="{{ url_for('admin_teachers') }}">
 
@@ -20,20 +30,16 @@
 </form>
 
 <br>
-<br><br>
-
-<table class="student-table">
-
     <thead>
-
+         
         <tr>
-            <th>Action</th>
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
             <th>Phone</th>
             <th>City</th>
             <th>Status</th>
+            <th>Action</th>
         </tr>
 
     </thead>
@@ -43,14 +49,15 @@
     {% for teacher in teachers %}
 
         <tr>
-
+            
             <td>{{ teacher.id }}</td>
             <td>{{ teacher.full_name }}</td>
             <td>{{ teacher.email }}</td>
             <td>{{ teacher.phone or '-' }}</td>
             <td>{{ teacher.city or '-' }}</td>
             <td>{{ teacher.status }}</td>
-             <td>
+            
+            <td>
 
 <form
     method="POST"

@@ -1,57 +1,33 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Admin - Stories</title>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-
 <body>
 
-<div class="admin-container">
+    <h1>📚 Manage Stories</h1>
 
-    <div class="admin-header">
-        <div>
-            <h1>📖 Stories</h1>
-            <p>Manage educational stories.</p>
-        </div>
-
-        <a href="{{ url_for('admin_dashboard') }}">
-            ← Admin Dashboard
-        </a>
-    </div>
-
+    <a href="{{ url_for('admin_dashboard') }}">
+        ← Admin Dashboard
+    </a>
 
     <!-- Search -->
-    <form
-        method="GET"
-        class="admin-search"
-        action="{{ url_for('admin_stories') }}"
-    >
+    <form method="GET"
+          class="admin-search"
+          action="{{ url_for('admin_stories') }}">
 
-        <input
-            type="text"
-            name="search"
-            value="{{ search }}"
-            placeholder="🔎 Search stories..."
-        >
+        <input type="text"
+               name="search"
+               value="{{ search or '' }}"
+               placeholder="🔎 Search stories...">
 
-        <button type="submit">
-            Search
-        </button>
-
+        <button type="submit">Search</button>
     </form>
-
-
-    <br>
-
 
     <!-- Stories -->
     <div class="admin-grid">
@@ -60,90 +36,82 @@
 
         <div class="admin-card">
 
-            <h3>📖 {{ story.title }}</h3>
+            <h3>{{ story.title }}</h3>
+
+            <p>Category: {{ story.category or 'General' }}</p>
 
             <p>
-                <strong>Category:</strong>
-                {{ story.category }}
+                Reading Time:
+                {{ story.reading_time or 'N/A' }}
             </p>
 
             <p>
-                <strong>Reading:</strong>
-                {{ story.reading_time }} minutes
-            </p>
-
-            <p>
-                <strong>Class:</strong>
+                Class:
                 {{ story.class_name or 'All Classes' }}
             </p>
 
             <p>
-                <strong>Status:</strong>
-                {{ story.status }}
+                Status:
+                <span class="{{ 'status-active' if story.status == 'active' else 'status-inactive' }}">
+                    {{ story.status }}
+                </span>
             </p>
 
+            <div class="admin-actions">
 
-            <!-- Status -->
-            {% if story.status == 'active' %}
+                <!-- Activate / Deactivate -->
+                <form method="POST"
+                      action="{{ url_for(
+                          'admin_story_status',
+                          story_id=story.id
+                      ) }}">
 
-            <form
-                method="POST"
-                action="{{ url_for(
-                    'admin_story_status',
-                    story_id=story.id
-                ) }}"
-            >
+                    {% if story.status == 'active' %}
+                        <input type="hidden"
+                               name="status"
+                               value="inactive">
 
-                <input
-                    type="hidden"
-                    name="status"
-                    value="inactive"
-                >
+                        <button type="submit">
+                            🔴 Deactivate
+                        </button>
+                    {% else %}
+                        <input type="hidden"
+                               name="status"
+                               value="active">
 
-                <button type="submit">
-                    🔴 Deactivate
-                </button>
+                        <button type="submit">
+                            🟢 Activate
+                        </button>
+                    {% endif %}
 
-            </form>
+                </form>
 
-            {% else %}
+                <!-- Delete -->
+                <form method="POST"
+                      action="{{ url_for(
+                          'admin_delete_story',
+                          story_id=story.id
+                      ) }}"
+                      onsubmit="return confirm('Delete this story permanently?');">
 
-            <form
-                method="POST"
-                action="{{ url_for(
-                    'admin_story_status',
-                    story_id=story.id
-                ) }}"
-            >
+                    <button type="submit"
+                            class="delete-button">
+                        🗑️ Delete
+                    </button>
 
-                <input
-                    type="hidden"
-                    name="status"
-                    value="active"
-                >
+                </form>
 
-                <button type="submit">
-                    🟢 Activate
-                </button>
-
-            </form>
-
-            {% endif %}
+            </div>
 
         </div>
 
         {% else %}
 
-        <div class="empty-progress">
-            📖 No stories found.
-        </div>
+        <p>No stories found.</p>
 
         {% endfor %}
 
     </div>
 
-</div>
-
 </body>
 </html>
-

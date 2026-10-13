@@ -257,15 +257,17 @@ function checkMatch() {
 
 
             if (
-                matchedPairs ==={{ cards|length // 2 }}
+                matchedPairs ===
+                {{ cards|length // 2 }}
             ) {
 
                 finishGame();
-  
-             }
 
-            }, 400);
-        }else {
+            }
+
+        }, 400);
+
+    } else {
 
         setTimeout(function() {
 

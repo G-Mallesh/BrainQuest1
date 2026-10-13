@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,37 +9,6 @@
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
-
-    <style>
-        .parent-login-btn {
-            display: inline-block;
-            padding: 12px 22px;
-            background: #2563eb;
-            color: white;
-            text-decoration: none;
-            border-radius: 10px;
-            font-weight: 600;
-            margin: 8px;
-            transition: 0.3s ease;
-        }
-
-        .parent-login-btn:hover {
-            background: #1d4ed8;
-            transform: translateY(-2px);
-        }
-
-        .buttons {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .buttons a {
-            display: inline-block;
-        }
-    </style>
 </head>
 
 <body>
@@ -51,30 +19,27 @@
 
         <h2>Learn • Play • Create • Grow</h2>
 
-        <p>Welcome to BrainQuest Kids!</p>
+        <p>
+            Welcome to BrainQuest Kids!
+        </p>
 
         <div class="buttons">
-
-            <a href="{{ url_for('register') }}">
+    
+            <a href="/register">
                 🚀 Register
             </a>
 
-            <a href="{{ url_for('login') }}">
+            <a href="/login">
                 🔐 Login
             </a>
-
-            <a href="{{ url_for('test_db') }}">
+             <a href="{{ url_for('parent_register') }}">
+               👨‍👩‍👧 Parent Registration
+              </a>
+             <a href="/parent-dashboard">
+                👨‍👩‍👧 Parent Dashboard
+              </a>
+            <a href="/test-db">
                 🗄️ Test Database
-            </a>
-
-            <a href="{{ url_for('parent_login') }}"
-               class="parent-login-btn">
-                👨‍👩‍👧 Parent Login
-            </a>
-
-            <a href="{{ url_for('parent_register') }}"
-               class="parent-login-btn">
-                📝 Parent Registration
             </a>
 
         </div>

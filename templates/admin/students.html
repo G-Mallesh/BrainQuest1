@@ -1,51 +1,214 @@
-<h1>👨‍🎓 Students</h1>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-<a href="{{ url_for('admin_dashboard') }}">
-    ← Admin Dashboard
-</a>
+<!DOCTYPE html>
+<html lang="en">
 
-<br><br>
+<head>
 
-<table class="student-table">
+    <meta charset="UTF-8">
 
-    <thead>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Class</th>
-            <th>City</th>
-            <th>Status</th>
-        </tr>
+    <title>
+        Students - Teacher Panel
+    </title>
 
-    </thead>
+    <link rel="stylesheet"
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
 
-    <tbody>
+</head>
 
-    {% for student in students %}
+<body>
 
-        <tr>
+<div class="teacher-container">
 
-            <td>{{ student.id }}</td>
+    <div class="teacher-header">
 
-            <td>{{ student.full_name }}</td>
+        <div>
 
-            <td>{{ student.email }}</td>
+            <h1>
+                👨‍🎓 Students
+            </h1>
 
-            <td>{{ student.phone or '-' }}</td>
+            <p>
+                Student learning overview
+            </p>
 
-            <td>{{ student.class_name or '-' }}</td>
+        </div>
+        <form method="GET"
+      action="{{ url_for('admin_students') }}">
 
-            <td>{{ student.city or '-' }}</td>
+    <input
+        type="text"
+        name="search"
+        placeholder="Search student..."
+        value="{{ search }}"
+    >
 
-            <td>{{ student.status }}</td>
+    <button type="submit">
+        🔎 Search
+    </button>
 
-        </tr>
+</form>
 
-    {% endfor %}
+<br>
+        <a
+            href="{{ url_for(
+                'teacher_dashboard'
+            ) }}"
+        >
+            ← Teacher Dashboard
+        </a>
 
-    </tbody>
+    </div>
 
-</table>
+
+    <section class="teacher-section">
+
+        <div class="student-table-wrapper">
+
+            <table class="student-table">
+
+                <thead>
+
+                <tr>
+
+                    <th>
+                        Name
+                    </th>
+
+                    <th>
+                        Email
+                    </th>
+
+                    <th>
+                        Class
+                    </th>
+
+                    <th>
+                        XP
+                    </th>
+
+                    <th>
+                        Level
+                    </th>
+                     
+                        Streak
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+                   <th>Action</th>
+                    <th>
+                </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for student in students %}
+
+                <tr>
+                     
+                    <td>
+                        {{ student.full_name }}
+                    </td>
+
+                    <td>
+                        {{ student.email }}
+                    </td>
+
+                    <td>
+                        {{ student.class_name or
+                           "Not Assigned" }}
+                    </td>
+
+                    <td>
+                        ⭐ {{ student.total_xp }}
+                    </td>
+
+                    <td>
+                        🏅
+                        {{ student.current_level }}
+                    </td>
+
+                    <td>
+                        🔥
+                        {{ student.current_streak }}
+                    </td>
+
+                  
+                    <td>
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'admin_student_status',
+            student_id=student.id
+        ) }}"
+    >
+
+        {% if student.status == 'active' %}
+
+            <input
+                type="hidden"
+                name="status"
+                value="inactive"
+            >
+
+            <button type="submit"
+                    class="delete-button">
+                🔴 Deactivate
+            </button>
+
+        {% else %}
+
+            <input
+                type="hidden"
+                name="status"
+                value="active"
+            >
+
+            <button type="submit"
+                    class="teacher-primary-button">
+                🟢 Activate
+            </button>
+
+        {% endif %}
+
+    </form>
+
+</td>
+                </tr>
+                 
+                {% else %}
+
+                <tr>
+
+                    <td colspan="7">
+
+                        No students found.
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+
+</html>

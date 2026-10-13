@@ -1,57 +1,33 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Admin - Videos</title>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-
 <body>
 
-<div class="admin-container">
+    <h1>🎬 Manage Videos</h1>
 
-    <div class="admin-header">
-        <div>
-            <h1>🎬 Videos</h1>
-            <p>Manage educational videos.</p>
-        </div>
-
-        <a href="{{ url_for('admin_dashboard') }}">
-            ← Admin Dashboard
-        </a>
-    </div>
-
+    <a href="{{ url_for('admin_dashboard') }}">
+        ← Admin Dashboard
+    </a>
 
     <!-- Search -->
-    <form
-        method="GET"
-        class="admin-search"
-        action="{{ url_for('admin_videos') }}"
-    >
+    <form method="GET"
+          class="admin-search"
+          action="{{ url_for('admin_videos') }}">
 
-        <input
-            type="text"
-            name="search"
-            value="{{ search }}"
-            placeholder="🔎 Search videos..."
-        >
+        <input type="text"
+               name="search"
+               value="{{ search or '' }}"
+               placeholder="🔎 Search videos...">
 
-        <button type="submit">
-            Search
-        </button>
-
+        <button type="submit">Search</button>
     </form>
-
-
-    <br>
-
 
     <!-- Videos -->
     <div class="admin-grid">
@@ -60,94 +36,89 @@
 
         <div class="admin-card">
 
-            <h3>🎬 {{ video.title }}</h3>
+            <h3>{{ video.title }}</h3>
+
+            <p>Category: {{ video.category or 'General' }}</p>
+
+            <p>Video Type: {{ video.video_type or 'N/A' }}</p>
 
             <p>
-                <strong>Category:</strong>
-                {{ video.category }}
+                Duration:
+                {% if video.duration_seconds is not none %}
+                    {{ (video.duration_seconds // 60) }} min
+                    {{ (video.duration_seconds % 60) }} sec
+                {% else %}
+                    N/A
+                {% endif %}
             </p>
 
             <p>
-                <strong>Type:</strong>
-                {{ video.video_type }}
-            </p>
-
-            <p>
-                <strong>Duration:</strong>
-                {{ video.duration_seconds }} seconds
-            </p>
-
-            <p>
-                <strong>Class:</strong>
+                Class:
                 {{ video.class_name or 'All Classes' }}
             </p>
 
             <p>
-                <strong>Status:</strong>
-                {{ video.status }}
+                Status:
+                <span class="{{ 'status-active' if video.status == 'active' else 'status-inactive' }}">
+                    {{ video.status }}
+                </span>
             </p>
 
+            <div class="admin-actions">
 
-            <!-- Status -->
-            {% if video.status == 'active' %}
+                <!-- Activate / Deactivate -->
+                <form method="POST"
+                      action="{{ url_for(
+                          'admin_video_status',
+                          video_id=video.id
+                      ) }}">
 
-            <form
-                method="POST"
-                action="{{ url_for(
-                    'admin_video_status',
-                    video_id=video.id
-                ) }}"
-            >
+                    {% if video.status == 'active' %}
+                        <input type="hidden"
+                               name="status"
+                               value="inactive">
 
-                <input
-                    type="hidden"
-                    name="status"
-                    value="inactive"
-                >
+                        <button type="submit">
+                            🔴 Deactivate
+                        </button>
+                    {% else %}
+                        <input type="hidden"
+                               name="status"
+                               value="active">
 
-                <button type="submit">
-                    🔴 Deactivate
-                </button>
+                        <button type="submit">
+                            🟢 Activate
+                        </button>
+                    {% endif %}
 
-            </form>
+                </form>
 
-            {% else %}
+                <!-- Delete -->
+                <form method="POST"
+                      action="{{ url_for(
+                          'admin_delete_video',
+                          video_id=video.id
+                      ) }}"
+                      onsubmit="return confirm('Delete this video permanently?');">
 
-            <form
-                method="POST"
-                action="{{ url_for(
-                    'admin_video_status',
-                    video_id=video.id
-                ) }}"
-            >
+                    <button type="submit"
+                            class="delete-button">
+                        🗑️ Delete
+                    </button>
 
-                <input
-                    type="hidden"
-                    name="status"
-                    value="active"
-                >
+                </form>
 
-                <button type="submit">
-                    🟢 Activate
-                </button>
-
-            </form>
-
-            {% endif %}
+            </div>
 
         </div>
 
         {% else %}
 
-        <div class="empty-progress">
-            🎬 No videos found.
-        </div>
+        <p>No videos found.</p>
 
         {% endfor %}
 
     </div>
-
-</div>
 
 </body>
 </html>

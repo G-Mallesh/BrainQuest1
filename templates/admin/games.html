@@ -1,174 +1,129 @@
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Admin - Games</title>
-    <link
+<h1>🎮 Games</h1>
+  <link
         rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
     >
-    
-</head>
+<a href="{{ url_for('admin_dashboard') }}">
+    ← Admin Dashboard
+</a>
 
-<body>
+<br>
+<form method="GET"
+      action="{{ url_for('admin_games') }}">
 
-<div class="admin-container">
-
-    <div class="admin-header">
-
-        <div>
-            <h1>🎮 Games</h1>
-            <p>Manage educational games.</p>
-        </div>
-
-        <a href="{{ url_for('admin_dashboard') }}">
-            ← Admin Dashboard
-        </a>
-
-    </div>
-
-
-    <!-- Search -->
-    <form
-        method="GET"
-        action="{{ url_for('admin_games') }}"
-        class="admin-search"
+    <input
+        type="text"
+        name="search"
+        placeholder="Search games..."
+        value="{{ search }}"
     >
 
-        <input
-            type="text"
-            name="search"
-            placeholder="🔎 Search games..."
-            value="{{ search }}"
-        >
+    <button type="submit">
+        🔎 Search
+    </button>
 
-        <button type="submit">
-            Search
-        </button>
+</form>
 
-    </form>
+</br>
 
+<div class="admin-grid">
 
-    <br>
+{% for game in games %}
 
+    <div class="admin-card">
 
-    <!-- Games -->
-    <div class="admin-grid">
+        <h3>{{ game.title }}</h3>
 
-        {% for game in games %}
+        <p>
+            Type: {{ game.game_type }}
+        </p>
 
-        <div class="admin-card">
+        <p>
+            Difficulty: {{ game.difficulty }}
+        </p>
 
-            <h3>🎮 {{ game.title }}</h3>
+        <p>
+            Points: {{ game.points }}
+        </p>
 
-            <p>
-                <strong>Type:</strong>
-                {{ game.game_type }}
-            </p>
+        <p>
+            Status: {{ game.status }}
+        </p>
+         <br>
 
-            <p>
-                <strong>Difficulty:</strong>
-                {{ game.difficulty }}
-            </p>
+{% if game.status == 'active' %}
 
-            <p>
-                <strong>Points:</strong>
-                {{ game.points }}
-            </p>
+<form
+    method="POST"
+    action="{{ url_for(
+        'admin_game_status',
+        game_id=game.id
+    ) }}"
+    style="display:inline;"
+>
 
-            <p>
-                <strong>Status:</strong>
-                {{ game.status }}
-            </p>
+    <input
+        type="hidden"
+        name="status"
+        value="inactive"
+    >
 
+    <button type="submit">
+        🔴 Deactivate
+    </button>
 
-            <!-- Activate / Deactivate -->
-            {% if game.status == 'active' %}
+</form>
 
-            <form
-                method="POST"
-                action="{{ url_for(
-                    'admin_game_status',
-                    game_id=game.id
-                ) }}"
-                style="display:inline;"
-            >
+{% else %}
 
-                <input
-                    type="hidden"
-                    name="status"
-                    value="inactive"
-                >
+<form
+    method="POST"
+    action="{{ url_for(
+        'admin_game_status',
+        game_id=game.id
+    ) }}"
+    style="display:inline;"
+>
 
-                <button type="submit">
-                    🔴 Deactivate
-                </button>
+    <input
+        type="hidden"
+        name="status"
+        value="active"
+    >
 
-            </form>
+    <button type="submit">
+        🟢 Activate
+    </button>
 
-            {% else %}
+</form>
 
-            <form
-                method="POST"
-                action="{{ url_for(
-                    'admin_game_status',
-                    game_id=game.id
-                ) }}"
-                style="display:inline;"
-            >
+{% endif %}
 
-                <input
-                    type="hidden"
-                    name="status"
-                    value="active"
-                >
+<form
+    method="POST"
+    action="{{ url_for(
+        'admin_delete_game',
+        game_id=game.id
+    ) }}"
+    style="display:inline;"
+    onsubmit="return confirm(
+        'Delete this game?'
+    );"
+>
 
-                <button type="submit">
-                    🟢 Activate
-                </button>
+    <button
+        type="submit"
+        class="delete-button"
+    >
+        🗑️ Delete
+    </button>
 
-            </form>
-
-            {% endif %}
-
-
-            <!-- Delete -->
-            <form
-                method="POST"
-                action="{{ url_for(
-                    'admin_delete_game',
-                    game_id=game.id
-                ) }}"
-                style="display:inline;"
-                onsubmit="return confirm('Delete this game?');"
-            >
-
-                <button
-                    type="submit"
-                    class="delete-button"
-                >
-                    🗑️ Delete
-                </button>
-
-            </form>
-
-        </div>
-
-        {% else %}
-
-        <div class="empty-progress">
-            🎮 No games found.
-        </div>
-
-        {% endfor %}
-
+</form>
     </div>
+
+{% endfor %}
 
 </div>
-
-</body>
-</html>
-

@@ -1,57 +1,33 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Admin - Tasks</title>
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
-    >
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-
 <body>
 
-<div class="admin-container">
+    <h1>📝 Manage Tasks</h1>
 
-    <div class="admin-header">
-        <div>
-            <h1>📝 Tasks</h1>
-            <p>Manage student learning tasks.</p>
-        </div>
-
-        <a href="{{ url_for('admin_dashboard') }}">
-            ← Admin Dashboard
-        </a>
-    </div>
-
+    <a href="{{ url_for('admin_dashboard') }}">
+        ← Admin Dashboard
+    </a>
 
     <!-- Search -->
-    <form
-        method="GET"
-        class="admin-search"
-        action="{{ url_for('admin_tasks') }}"
-    >
+    <form method="GET"
+          class="admin-search"
+          action="{{ url_for('admin_tasks') }}">
 
-        <input
-            type="text"
-            name="search"
-            value="{{ search }}"
-            placeholder="🔎 Search tasks..."
-        >
+        <input type="text"
+               name="search"
+               value="{{ search or '' }}"
+               placeholder="🔎 Search tasks...">
 
-        <button type="submit">
-            Search
-        </button>
-
+        <button type="submit">Search</button>
     </form>
-
-
-    <br>
-
 
     <!-- Tasks -->
     <div class="admin-grid">
@@ -60,94 +36,84 @@
 
         <div class="admin-card">
 
-            <h3>📝 {{ task.title }}</h3>
+            <h3>{{ task.title }}</h3>
+
+            <p>Type: {{ task.task_type or 'General' }}</p>
+
+            <p>XP Points: {{ task.points or 0 }}</p>
 
             <p>
-                <strong>Type:</strong>
-                {{ task.task_type }}
-            </p>
-
-            <p>
-                <strong>XP:</strong>
-                {{ task.points }}
-            </p>
-
-            <p>
-                <strong>Class:</strong>
+                Class:
                 {{ task.class_name or 'All Classes' }}
             </p>
 
             <p>
-                <strong>Due:</strong>
+                Due Date:
                 {{ task.due_date or 'No deadline' }}
             </p>
 
             <p>
-                <strong>Status:</strong>
-                {{ task.status }}
+                Status:
+                <span class="{{ 'status-active' if task.status == 'active' else 'status-inactive' }}">
+                    {{ task.status }}
+                </span>
             </p>
 
+            <div class="admin-actions">
 
-            <!-- Status -->
-            {% if task.status == 'active' %}
+                <!-- Activate / Deactivate -->
+                <form method="POST"
+                      action="{{ url_for(
+                          'admin_task_status',
+                          task_id=task.id
+                      ) }}">
 
-            <form
-                method="POST"
-                action="{{ url_for(
-                    'admin_task_status',
-                    task_id=task.id
-                ) }}"
-            >
+                    {% if task.status == 'active' %}
+                        <input type="hidden"
+                               name="status"
+                               value="inactive">
 
-                <input
-                    type="hidden"
-                    name="status"
-                    value="inactive"
-                >
+                        <button type="submit">
+                            🔴 Deactivate
+                        </button>
+                    {% else %}
+                        <input type="hidden"
+                               name="status"
+                               value="active">
 
-                <button type="submit">
-                    🔴 Deactivate
-                </button>
+                        <button type="submit">
+                            🟢 Activate
+                        </button>
+                    {% endif %}
 
-            </form>
+                </form>
 
-            {% else %}
+                <!-- Delete -->
+                <form method="POST"
+                      action="{{ url_for(
+                          'admin_delete_task',
+                          task_id=task.id
+                      ) }}"
+                      onsubmit="return confirm('Delete this task permanently?');">
 
-            <form
-                method="POST"
-                action="{{ url_for(
-                    'admin_task_status',
-                    task_id=task.id
-                ) }}"
-            >
+                    <button type="submit"
+                            class="delete-button">
+                        🗑️ Delete
+                    </button>
 
-                <input
-                    type="hidden"
-                    name="status"
-                    value="active"
-                >
+                </form>
 
-                <button type="submit">
-                    🟢 Activate
-                </button>
-
-            </form>
-
-            {% endif %}
+            </div>
 
         </div>
 
         {% else %}
 
-        <div class="empty-progress">
-            📝 No tasks found.
-        </div>
+        <p>No tasks found.</p>
 
         {% endfor %}
 
     </div>
-
-</div>
 
 </body>
 </html>

@@ -171,7 +171,9 @@ if (completeButton) {
         function () {
 
             fetch(
-                "{{ url_for('complete_story',story_id=story.id
+                "{{ url_for(
+                    'complete_story',
+                    story_id=story.id
                 ) }}",
                 {
 

@@ -1,22 +1,32 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>My Progress - BrainQuest Kids</title>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        My Progress - BrainQuest Kids
+    </title>
 
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+          href="{{ url_for(
+              'static',
+              filename='css/style.css'
+          ) }}">
+
 </head>
 
 <body>
 
 <div class="progress-container">
 
+
     <!-- HEADER -->
+
     <div class="progress-header">
 
         <a href="{{ url_for('dashboard') }}">
@@ -35,6 +45,7 @@
 
 
     <!-- XP CARD -->
+
     <div class="progress-hero">
 
         <div class="level-circle">
@@ -65,14 +76,15 @@
 
                 <div
                     class="xp-bar-fill"
-                    style="width: {{ level_percentage|default(0)|int }}%;">
-                </div>
+                    style="width:
+                    {{ level_percentage }}%;"
+                ></div>
 
             </div>
 
 
             <small>
-                {{ level_percentage|default(0)|round|int }}%
+                {{ level_percentage|round|int }}%
                 to next level
             </small>
 
@@ -82,55 +94,22 @@
 
 
     <!-- QUICK STATS -->
-    <div class="progress-stats">
 
-        <div class="streak-message">
+    <div class="progress-stat">
 
-            {% if xp.current_streak == 0 %}
+    <div class="progress-stat-icon">
+        🔥
+    </div>
 
-                🌱 Start learning today
-                and build your streak!
+    <h2>
+        {{ xp.current_streak }}
+    </h2>
 
-            {% elif xp.current_streak < 3 %}
+    <p>
+        Day Streak
+    </p>
 
-                🔥 Great start!
-                Keep learning every day.
-
-            {% elif xp.current_streak < 7 %}
-
-                🚀 Amazing!
-                You are building a strong streak.
-
-            {% elif xp.current_streak < 30 %}
-
-                🏆 Fantastic!
-                You reached a 7+ day streak!
-
-            {% else %}
-
-                👑 Incredible!
-                You are a BrainQuest Kids champion!
-
-            {% endif %}
-
-        </div>
-
-
-        <div class="progress-stat">
-
-            <div class="progress-stat-icon">
-                🔥
-            </div>
-
-            <h2>
-                {{ xp.current_streak }}
-            </h2>
-
-            <p>
-                Day Streak
-            </p>
-
-        </div>
+</div>
 
 
         <div class="progress-stat">
@@ -187,6 +166,7 @@
 
 
     <!-- ACTIVITY SUMMARY -->
+
     <section class="progress-section">
 
         <h2>
@@ -195,6 +175,7 @@
 
 
         <div class="activity-grid">
+
 
             <div class="activity-card">
 
@@ -285,6 +266,7 @@
 
 
     <!-- SUBJECT PROGRESS -->
+
     <section class="progress-section">
 
         <h2>
@@ -303,9 +285,11 @@
                 </strong>
 
                 <span>
+
                     {{ item.completed_activities }}
                     /
                     {{ item.total_activities }}
+
                 </span>
 
             </div>
@@ -327,20 +311,52 @@
 
             {% endif %}
 
+           <div class="streak-message">
 
+    {% if xp.current_streak == 0 %}
+
+        🌱 Start learning today
+        and build your streak!
+
+    {% elif xp.current_streak < 3 %}
+
+        🔥 Great start!
+        Keep learning every day.
+
+    {% elif xp.current_streak < 7 %}
+
+        🚀 Amazing!
+        You are building a strong streak.
+
+    {% elif xp.current_streak < 30 %}
+
+        🏆 Fantastic!
+        You reached a 7+ day streak!
+
+    {% else %}
+
+        👑 Incredible!
+        You are a BrainQuest Kids champion!
+
+    {% endif %}
+
+</div>
             <div class="subject-progress-bar">
 
                 <div
                     class="subject-progress-fill"
-                    style="width: {{ percentage|round|int }}%;">
-                </div>
+                    style="width:
+                    {{ percentage }}%;"
+                ></div>
 
             </div>
 
 
             <small>
+
                 {{ percentage|round|int }}%
                 completed
+
             </small>
 
         </div>
@@ -360,6 +376,7 @@
 
 
     <!-- BADGES -->
+
     <section class="progress-section">
 
         <h2>
@@ -367,21 +384,21 @@
         </h2>
 
         <p class="reward-description">
-            Complete learning activities to unlock
-            special BrainQuest Kids badges!
-        </p>
-
-
+    Complete learning activities to unlock
+    special BrainQuest Kids badges!
+</p>
         <div class="badges-grid">
 
             {% for badge in badges %}
 
-            <div class="badge-card
+            <div
+                class="badge-card
                 {% if badge.earned_at %}
                     badge-earned
                 {% else %}
                     badge-locked
-                {% endif %}">
+                {% endif %}"
+            >
 
                 <div class="badge-icon">
 
@@ -416,15 +433,17 @@
 
                 {% if badge.earned_at %}
 
-                <span class="badge-status">
-                    ✅ Earned
-                </span>
+                    <span class="badge-status">
+                        ✅ Earned
+                    </span>
 
                 {% else %}
 
-                <span class="badge-status">
-                    🔒 {{ badge.required_xp }} XP
-                </span>
+                    <span class="badge-status">
+                        🔒
+                        {{ badge.required_xp }}
+                        XP
+                    </span>
 
                 {% endif %}
 
@@ -433,7 +452,9 @@
             {% else %}
 
             <div class="empty-progress">
+
                 No badges available yet.
+
             </div>
 
             {% endfor %}
@@ -444,6 +465,7 @@
 
 
     <!-- RECENT SCORES -->
+
     <section class="progress-section">
 
         <h2>
@@ -457,29 +479,29 @@
 
                 <thead>
 
-                    <tr>
+                <tr>
 
-                        <th>
-                            Game
-                        </th>
+                    <th>
+                        Game
+                    </th>
 
-                        <th>
-                            Score
-                        </th>
+                    <th>
+                        Score
+                    </th>
 
-                        <th>
-                            Correct
-                        </th>
+                    <th>
+                        Correct
+                    </th>
 
-                        <th>
-                            Wrong
-                        </th>
+                    <th>
+                        Wrong
+                    </th>
 
-                        <th>
-                            Date
-                        </th>
+                    <th>
+                        Date
+                    </th>
 
-                    </tr>
+                </tr>
 
                 </thead>
 
@@ -488,39 +510,42 @@
 
                 {% for score in recent_scores %}
 
-                    <tr>
+                <tr>
 
-                        <td>
-                            {{ score.game_title or "Game" }}
-                        </td>
+                    <td>
+                        {{ score.game_title or
+                           "Game" }}
+                    </td>
 
-                        <td>
-                            ⭐ {{ score.score }}
-                        </td>
+                    <td>
+                        ⭐ {{ score.score }}
+                    </td>
 
-                        <td>
-                            {{ score.correct_answers }}
-                        </td>
+                    <td>
+                        {{ score.correct_answers }}
+                    </td>
 
-                        <td>
-                            {{ score.wrong_answers }}
-                        </td>
+                    <td>
+                        {{ score.wrong_answers }}
+                    </td>
 
-                        <td>
-                            {{ score.played_at }}
-                        </td>
+                    <td>
+                        {{ score.played_at }}
+                    </td>
 
-                    </tr>
+                </tr>
 
                 {% else %}
 
-                    <tr>
+                <tr>
 
-                        <td colspan="5">
-                            🎮 No games played yet.
-                        </td>
+                    <td colspan="5">
 
-                    </tr>
+                        🎮 No games played yet.
+
+                    </td>
+
+                </tr>
 
                 {% endfor %}
 
@@ -534,32 +559,37 @@
 
 
     <!-- NAVIGATION -->
+
     <div class="progress-navigation">
 
         <a
             href="{{ url_for('tasks') }}"
-            class="progress-nav-button">
+            class="progress-nav-button"
+        >
             📝 Daily Tasks
         </a>
 
 
         <a
             href="{{ url_for('study') }}"
-            class="progress-nav-button">
+            class="progress-nav-button"
+        >
             📚 Study Zone
         </a>
 
 
         <a
             href="{{ url_for('videos') }}"
-            class="progress-nav-button">
+            class="progress-nav-button"
+        >
             🎬 Videos
         </a>
 
 
         <a
             href="{{ url_for('stories') }}"
-            class="progress-nav-button">
+            class="progress-nav-button"
+        >
             📖 Stories
         </a>
 

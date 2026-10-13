@@ -1,166 +1,52 @@
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Admin - Questions</title>
-
-    <link
+<h1>❓ Questions</h1>
+  <link
         rel="stylesheet"
-        href="{{ url_for('static', filename='css/style.css') }}"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
     >
+<a href="{{ url_for('admin_dashboard') }}">
+    ← Admin Dashboard
+</a>
 
-</head>
+<br><br>
 
+<table class="student-table">
 
-<body>
+<thead>
+<tr>
+    <th>ID</th>
+    <th>Game</th>
+    <th>Question</th>
+    <th>Answer</th>
+    <th>Points</th>
+    <th>Difficulty</th>
+</tr>
+</thead>
 
-<div class="admin-container">
+<tbody>
 
+{% for q in questions %}
 
-    <!-- Header -->
-    <div class="admin-header">
+<tr>
 
-        <div>
+    <td>{{ q.id }}</td>
 
-            <h1>❓ Questions</h1>
+    <td>{{ q.game_title or '-' }}</td>
 
-            <p>
-                Manage game questions and answers.
-            </p>
+    <td>{{ q.question_text }}</td>
 
-        </div>
+    <td>{{ q.correct_answer }}</td>
 
+    <td>{{ q.points }}</td>
 
-        <a href="{{ url_for('admin_dashboard') }}">
-            ← Admin Dashboard
-        </a>
+    <td>{{ q.difficulty }}</td>
 
-    </div>
+</tr>
 
+{% endfor %}
 
-    <!-- Search -->
-    <form
-        method="GET"
-        action="{{ url_for('admin_questions') }}"
-        class="admin-search"
-    >
+</tbody>
 
-        <input
-            type="text"
-            name="search"
-            value="{{ search or '' }}"
-            placeholder="🔎 Search questions..."
-        >
-
-        <button type="submit">
-            Search
-        </button>
-
-    </form>
-
-
-    <br>
-
-
-    <!-- Questions Table -->
-    <div style="overflow-x:auto;">
-
-        <table class="student-table">
-
-            <thead>
-
-                <tr>
-
-                    <th>ID</th>
-
-                    <th>Game</th>
-
-                    <th>Question</th>
-
-                    <th>Answer</th>
-
-                    <th>Points</th>
-
-                    <th>Difficulty</th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                {% for q in questions %}
-
-                <tr>
-
-                    <td>
-                        {{ q.id }}
-                    </td>
-
-
-                    <td>
-                        {{ q.game_title or '-' }}
-                    </td>
-
-
-                    <td>
-                        {{ q.question_text }}
-                    </td>
-
-
-                    <td>
-                        {{ q.correct_answer }}
-                    </td>
-
-
-                    <td>
-                        {{ q.points }}
-                    </td>
-
-
-                    <td>
-                        {{ q.difficulty }}
-                    </td>
-
-                </tr>
-
-                {% else %}
-
-                <tr>
-
-                    <td
-                        colspan="6"
-                        style="text-align:center; padding:30px;"
-                    >
-
-                        ❓ No questions found.
-
-                    </td>
-
-                </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-
-</div>
-
-</body>
-
-</html>
-
+</table>

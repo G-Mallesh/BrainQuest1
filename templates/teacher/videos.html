@@ -1,11 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Teacher Videos</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Teacher Videos - BrainQuest</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
@@ -15,16 +18,12 @@
 
 <div class="teacher-container">
 
+    <!-- Header -->
     <div class="teacher-header">
 
         <div>
-
             <h1>🎬 Video Management</h1>
-
-            <p>
-                Manage educational videos for students.
-            </p>
-
+            <p>Manage educational videos.</p>
         </div>
 
         <a href="{{ url_for('teacher_dashboard') }}">
@@ -33,21 +32,17 @@
 
     </div>
 
-
     <section class="teacher-section">
 
-        <!-- Toolbar -->
+        <!-- Add Video Button -->
         <div class="question-toolbar">
 
             <a href="{{ url_for('teacher_add_video') }}"
                class="teacher-primary-button">
-
                 ➕ Add Video
-
             </a>
 
         </div>
-
 
         <!-- Video Cards -->
         <div class="teacher-content-grid">
@@ -60,103 +55,89 @@
                     🎬
                 </div>
 
-
-                <h3>
-                    {{ video.title }}
-                </h3>
-
+                <h3>{{ video.title }}</h3>
 
                 <p>
-                    <strong>Type:</strong>
-                    {{ video.video_type|capitalize }}
+                    Video Type:
+                    {{ video.video_type|default('Video', true)|capitalize }}
                 </p>
 
-
                 <p>
-                    <strong>Category:</strong>
-                    {{ video.category|capitalize }}
+                    Category:
+                    {{ video.category|default('General', true)|capitalize }}
                 </p>
 
-
                 <p>
-                    🎓
-                    {{ video.class_name or "All Classes" }}
+                    🎓 Class:
+                    {{ video.class_name or 'All Classes' }}
                 </p>
 
-
-                {% if video.duration_seconds %}
-
                 <p>
-                    ⏱️
-                    {{ video.duration_seconds }}
+                    ⏱️ Duration:
+                    {{ video.duration_seconds|default(0, true) }}
                     seconds
                 </p>
 
+                <span class="content-status">
+                    {{ video.status|default('Active', true) }}
+                </span>
+
+                <br><br>
+
+                <!-- Play Video (if uploaded path exists) -->
+                {% if video.video_path %}
+
+                <video controls
+                       preload="metadata"
+                       style="width:100%; max-height:220px;">
+
+                    <source
+                        src="{{ url_for('uploaded_file', filename=video.video_path) }}"
+                        type="video/mp4">
+
+                    Your browser does not support video playback.
+
+                </video>
+
+                <br><br>
+
                 {% endif %}
 
+                <!-- Edit Button -->
+                <a href="{{ url_for('teacher_edit_video', video_id=video.id) }}"
+                   class="teacher-primary-button">
+                    ✏️ Edit
+                </a>
 
-                {% if video.description %}
+                <!-- Delete Button -->
+                <form
+                    method="POST"
+                    action="{{ url_for('teacher_delete_video', video_id=video.id) }}"
+                    style="display:inline;"
+                    onsubmit="return confirm('Are you sure you want to delete this video?');">
 
-                <p>
-                    {{ video.description }}
-                </p>
+                    <button type="submit" class="delete-button">
+                        🗑️ Delete
+                    </button>
 
-                {% endif %}
-
-
-                <p>
-                    Status:
-
-                    <span class="content-status">
-                        {{ video.status }}
-                    </span>
-
-                </p>
-
-
-                <!-- ACTION BUTTONS -->
-                <div style="margin-top: 15px;">
-
-                    <a href="{{ url_for(
-                        'teacher_edit_video',
-                        video_id=video.id
-                    ) }}"
-                       class="teacher-primary-button">
-
-                        ✏️ Edit
-
-                    </a>
-
-
-                    <form method="POST"
-                          action="{{ url_for(
-                              'teacher_delete_video',
-                              video_id=video.id
-                          ) }}"
-                          style="display:inline;"
-                          onsubmit="return confirm(
-                              'Delete this video?'
-                          );">
-
-                        <button type="submit"
-                                class="delete-button">
-
-                            🗑️ Delete
-
-                        </button>
-
-                    </form>
-
-                </div>
+                </form>
 
             </div>
 
             {% else %}
 
+            <!-- Empty State -->
             <div class="empty-progress">
+                <h3>🎬 No Videos Available</h3>
 
-                🎬 No videos available.
+                <p>
+                    No educational videos have been added yet.
+                </p>
 
+                <a href="{{ url_for('teacher_add_video') }}"
+                   class="teacher-primary-button">
+                    ➕ Add Your First Video
+                </a>
             </div>
 
             {% endfor %}
