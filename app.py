@@ -83,8 +83,12 @@ def allowed_file(filename, allowed_extensions):
 # DATABASE CONNECTION
 # =========================================================
 
+
 def get_db_connection():
-    return mysql.connector.connect(**DB_CONFIG)
+    return mysql.connector.connect(
+        **DB_CONFIG,
+        connection_timeout=10,
+    )
 
 # =========================================================
 # BADGE SYSTEM
